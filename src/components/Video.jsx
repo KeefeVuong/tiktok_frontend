@@ -21,7 +21,7 @@ const tiktok_stats_style = {
   justifyContent: "center"
 }
 
-function Video( {tiktoks} ) {
+function Video( {tiktoks, setOpenWeeklyNotes} ) {
 
   const [notes, setNotes] = useState({})
   const [openSnackbar, setOpenSnackbar] = useState(false)
@@ -50,8 +50,9 @@ function Video( {tiktoks} ) {
             <TableCell width="13%">
               <Typography component="h2"><Box component="span" fontWeight="bold">Tiktok Statistics</Box></Typography>
             </TableCell>
-            <TableCell>
+            <TableCell sx={{display: "flex", justifyContent: "space-between"}}>
               <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
+              <Button onClick={() => {setOpenWeeklyNotes(true)}}>Test</Button>
             </TableCell>
           </TableRow>
         </TableHead>
