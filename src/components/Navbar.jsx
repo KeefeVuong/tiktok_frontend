@@ -35,7 +35,7 @@ const modalButtonStyle = {
     justifyContent: "space-between"
 }
 
-const NavBar = ({ weeklyReports, getWeeklyReports, tiktoks, getTiktoks, selected }) => {
+const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, getTiktoks, selected }) => {
     const location = useLocation()
     const navigate = useNavigate()
     const [snackbarMessage, setSnackbarMessage] = useState("")
@@ -82,9 +82,18 @@ const NavBar = ({ weeklyReports, getWeeklyReports, tiktoks, getTiktoks, selected
         //         alert("It hasn't been a week since the last weekly report")
         //         return
         //     }
-        // }
-        console.log(data)
+        // }   
+        const placeHolder = {
+            "id": "999999",
+            "last_updated": "loading"
+        }
+        let placeHolderReport = [ ... weeklyReports ]
+        placeHolderReport.push(placeHolder)
+        setWeeklyReports(placeHolderReport)
+        getWeeklyReports()
         await APIFetch("/api/weekly-reports/", "POST", data)
+        placeHolderReport.pop()
+        setWeeklyReports(placeHolderReport)
         getWeeklyReports()
         setSnackbarMessage("SUCCESS: Add Weekly Report")
         setOpenSnackbar(true)

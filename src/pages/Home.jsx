@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from 'react'
-import { Box, Button, Typography, Container, Link, Checkbox, Fab, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+import { Box, Button, Typography, Skeleton, Link, Backdrop, CircularProgress, Fab, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 import { DataGrid, gridColumnGroupsLookupSelector } from '@mui/x-data-grid';
 import { APIFetch, renderImprovements } from "../helper.jsx"
 import Navbar from "../components/Navbar"
@@ -13,6 +13,7 @@ function Home() {
   const navigate = useNavigate()
   const [weeklyReports, setWeeklyReports] = useState([])
   const [selected, setSelected] = useState([])
+  const [loading, setLoading] = useState(true)
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
 
   const columns = [
@@ -25,6 +26,9 @@ function Home() {
           )
         },
         renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
           const id = params.row.id
           const frag = `#weekly-report/${id}`
           return (
@@ -37,6 +41,11 @@ function Home() {
           return (
             <Typography fontWeight="bold">Start Date</Typography>
           )
+        },
+        renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
         }
       },
       { field: 'end_date', width: 150,
@@ -44,6 +53,11 @@ function Home() {
           return (
             <Typography fontWeight="bold">End Date</Typography>
           )
+        },
+        renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
         }
       },
       { field: 'total_views', width: 150,
@@ -53,6 +67,9 @@ function Home() {
           )
         }, 
         renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
           return renderImprovements(params.row.total_views, params.row.total_improvement_views, params.row.last_updated)
         }
       },
@@ -63,6 +80,9 @@ function Home() {
           )
         },
         renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
           return renderImprovements(params.row.total_likes, params.row.total_improvement_likes, params.row.last_updated)
         }
     },
@@ -73,6 +93,9 @@ function Home() {
           )
         },
         renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
           return renderImprovements(params.row.total_comments, params.row.total_improvement_comments, params.row.last_updated)
         }
     },
@@ -91,6 +114,11 @@ function Home() {
         return (
           <Typography fontWeight="bold">Last Updated</Typography>
         )
+      },
+      renderCell: (params) => {
+        if (params.row.last_updated === "loading") {
+          return <Skeleton animation="wave" width="100%" />
+        }
       }
     },
   ];
@@ -122,10 +150,11 @@ function Home() {
   useEffect(() => {
     checkAuth()
     getWeeklyReports()
+    .then(() => setLoading(false))
   }, [])
   return (
     <>
-    <Navbar weeklyReports={weeklyReports} getWeeklyReports={getWeeklyReports} selected={selected}/>
+    <Navbar weeklyReports={weeklyReports} setWeeklyReports={setWeeklyReports} getWeeklyReports={getWeeklyReports} selected={selected}/>
     <Box sx={{height: "calc(100vh - 65px)"}}>
         <DataGrid
         sx={{border: 0}}
@@ -137,6 +166,7 @@ function Home() {
         onRowSelectionModelChange={(newselected) => {
           setSelected(newselected);
         }}
+        localeText={{ noRowsLabel: loading ? "" : "No Weekly Reports Exist" }}
         autoPageSize
         // initialState={{
         //     pagination: { paginationModel: { pageSize: 10 } },
@@ -174,6 +204,15 @@ function Home() {
         </Button>
       </DialogActions>
     </Dialog>
+
+    <Backdrop
+      sx={{ display: "flex", flexDirection: "column", color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open={loading}
+    >
+      <CircularProgress color="inherit" sx={{marginBottom: "17px"}}/>
+      <Typography>Loading Weekly Reports...</Typography>
+      <Typography>Please wait :)</Typography>
+    </Backdrop>
     </>
   )
 }

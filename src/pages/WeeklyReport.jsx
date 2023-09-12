@@ -26,6 +26,7 @@ function WeeklyReport() {
 
   useEffect(() => {
     getTiktoks()
+
   }, [])
 
   return (
