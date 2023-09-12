@@ -57,7 +57,7 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {tiktoks.map((tiktok) => (
+          {tiktoks.reverse().map((tiktok) => (
             <TableRow
               key={tiktok.id}
             >
@@ -75,7 +75,7 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
                     <Box>{renderImprovements(tiktok.view_count, tiktok.improvement_view_count, tiktok.last_updated, true, "Views")}</Box>
                     <Box>{renderImprovements(tiktok.like_count, tiktok.improvement_like_count, tiktok.last_updated, true, "Likes")}</Box>
                     <Box>{renderImprovements(tiktok.comment_count, tiktok.improvement_comment_count, tiktok.last_updated, true, "Comments")}</Box>
-                    <Box>{renderImprovements(tiktok.favourite_count, tiktok.improvement_favourite_count, tiktok.last_updated, true, "Favourites")}</Box>
+                    {/* <Box>{renderImprovements(tiktok.favourite_count, tiktok.improvement_favourite_count, tiktok.last_updated, true, "Favourites")}</Box> */}
                   </Box>
                 </Box>
               </TableCell>

@@ -14,7 +14,7 @@ function WeeklyReport() {
 
   const getTiktoks = async () => {
     const tiktokData = await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
-    setTiktoks(tiktokData)
+    setTiktoks(tiktokData.reverse())
   }
 
   const editorRef = useRef(null);
