@@ -1,16 +1,13 @@
 import { React, useState, useEffect } from 'react'
 import { Box, Button, Typography, Skeleton, Link, Backdrop, CircularProgress, Fab, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 import { DataGrid, gridColumnGroupsLookupSelector } from '@mui/x-data-grid';
-import { APIFetch, renderImprovements } from "../helper.jsx"
+import { APIFetch, renderImprovements } from "../Helper.jsx"
 import Navbar from "../components/Navbar"
 import DeleteIcon from '@mui/icons-material/Delete';
-import {
-  useNavigate
-} from 'react-router-dom';
+
 
 
 function Home() {
-  const navigate = useNavigate()
   const [weeklyReports, setWeeklyReports] = useState([])
   const [selected, setSelected] = useState([])
   const [loading, setLoading] = useState(true)
@@ -124,14 +121,20 @@ function Home() {
   ];
 
   const deleteWeeklyReports = async () => {
+    sessionStorage.clear()
     await APIFetch("/api/weekly-reports/", "DELETE", { ids: selected })
     getWeeklyReports()
     setOpenDeleteConfirmation(false)
   }
 
   const getWeeklyReports = async () => {
+    if (sessionStorage.getItem("weeklyReports") !== null) {
+      setWeeklyReports(JSON.parse(sessionStorage.getItem("weeklyReports")))
+      return
+    }
     const weeklyReportData = await APIFetch("/api/weekly-reports/", "GET")
-    setWeeklyReports(weeklyReportData)
+    sessionStorage.setItem("weeklyReports", JSON.stringify(weeklyReportData))
+    setWeeklyReports(weeklyReportData.reverse())
     setSelected([])
   }
 
@@ -139,6 +142,7 @@ function Home() {
     if (localStorage.getItem("token") !== null) {
       await APIFetch("/api/login/", "POST")
       .catch(() => {
+          localStorage.removeItem("token")
           navigate("/login")
       })
     }

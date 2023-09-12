@@ -3,7 +3,7 @@ import { Dialog } from '@mui/material';
 import Video from "../components/Video"
 import Navbar from "../components/Navbar"
 import { useParams } from 'react-router-dom';
-import { APIFetch } from "../helper.jsx"
+import { APIFetch } from "../Helper.jsx"
 import { Editor } from '@tinymce/tinymce-react';
 
 function WeeklyReport() {
@@ -13,8 +13,8 @@ function WeeklyReport() {
   const params = useParams();
 
   const getTiktoks = async () => {
-    const tiktokData = await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
-    setTiktoks(tiktokData.reverse())
+    const tiktokData = (await APIFetch(`/api/weekly-reports/${params.id}`, "GET")).reverse()
+    setTiktoks(tiktokData)
   }
 
   const editorRef = useRef(null);
@@ -24,7 +24,21 @@ function WeeklyReport() {
     }
   };
 
+  const checkAuth = async () => {
+    if (localStorage.getItem("token") !== null) {
+      await APIFetch("/api/login/", "POST")
+      .catch(() => {
+          localStorage.removeItem("token")
+          navigate("/login")
+      })
+    }
+    else {
+      navigate("/login")
+    }
+  }
+
   useEffect(() => {
+    checkAuth()
     getTiktoks()
 
   }, [])

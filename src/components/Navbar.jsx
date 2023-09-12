@@ -5,7 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import 'dayjs/locale/en-gb';
-import { APIFetch } from '../helper';
+import { APIFetch } from '../Helper';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import SuccessSnackbar from './Snackbar';
@@ -87,8 +87,9 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
             "id": "999999",
             "last_updated": "loading"
         }
+        sessionStorage.clear()
         let placeHolderReport = [ ... weeklyReports ]
-        placeHolderReport.push(placeHolder)
+        placeHolderReport.unshift(placeHolder)
         setWeeklyReports(placeHolderReport)
         getWeeklyReports()
         await APIFetch("/api/weekly-reports/", "POST", data)
@@ -112,10 +113,11 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
                 urls.push(tiktokData[j]["url"])
             }
         }
+        sessionStorage.clear()
         await APIFetch("/api/tiktoks/", "PUT", {"urls": urls})
+        getWeeklyReports()
         setSnackbarMessage("SUCCESS: Bulk Refresh Stats")
         setOpenSnackbar(true)
-        getWeeklyReports()
     }
 
     const refreshStats = async () => {
@@ -123,6 +125,7 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
         for (let i in tiktoks) {
             urls.push(tiktoks[i]["url"])
         }
+        sessionStorage.clear()
         await APIFetch("/api/tiktoks/", "PUT", {"urls": urls})
         getTiktoks()
         setSnackbarMessage("SUCCESS: Refresh Stats")

@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { Autosave, useAutosave } from 'react-autosave';
-import { APIFetch, renderImprovements } from "../helper.jsx"
+import { APIFetch, renderImprovements } from "../Helper.jsx"
 import Snackbar from "./Snackbar"
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -50,14 +50,14 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
             <TableCell width="13%">
               <Typography component="h2"><Box component="span" fontWeight="bold">Tiktok Statistics</Box></Typography>
             </TableCell>
-            <TableCell sx={{display: "flex", justifyContent: "space-between"}}>
+            <TableCell>
               <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
               {/* <Button onClick={() => {setOpenWeeklyNotes(true)}}>Test</Button> */}
             </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {tiktoks.reverse().map((tiktok) => (
+          {tiktoks.map((tiktok) => (
             <TableRow
               key={tiktok.id}
             >
