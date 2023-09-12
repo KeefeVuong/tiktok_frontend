@@ -52,7 +52,7 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
             </TableCell>
             <TableCell sx={{display: "flex", justifyContent: "space-between"}}>
               <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
-              <Button onClick={() => {setOpenWeeklyNotes(true)}}>Test</Button>
+              {/* <Button onClick={() => {setOpenWeeklyNotes(true)}}>Test</Button> */}
             </TableCell>
           </TableRow>
         </TableHead>

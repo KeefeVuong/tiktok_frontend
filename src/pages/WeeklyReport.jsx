@@ -38,7 +38,7 @@ function WeeklyReport() {
         // TransitionComponent={Transition}
       >
         
-        <Editor
+        {/* <Editor
           id="5"
           init={{
             height: 500,
@@ -55,7 +55,7 @@ function WeeklyReport() {
             'removeformat | restoredraft | help | table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
             content_style: 'body { font-family:Monsterrat; font-size:14px }'
           }}
-        />
+        /> */}
       </Dialog>
     </>
   )

@@ -1,8 +1,5 @@
 import { useState } from 'react'
-import Search from './components/Search'
-import Videos from "./components/Videos"
 import "./App.css"
-import Navbar from './components/Navbar'
 import {
   HashRouter as Router,
   Routes,
