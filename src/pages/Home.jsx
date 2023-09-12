@@ -4,10 +4,13 @@ import { DataGrid, gridColumnGroupsLookupSelector } from '@mui/x-data-grid';
 import { APIFetch, renderImprovements } from "../Helper.jsx"
 import Navbar from "../components/Navbar"
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import {
+  useNavigate
+} from 'react-router-dom';
 
 
 function Home() {
+  const navigate = useNavigate()
   const [weeklyReports, setWeeklyReports] = useState([])
   const [selected, setSelected] = useState([])
   const [loading, setLoading] = useState(true)

@@ -1,9 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import {
-  useNavigate
-} from 'react-router-dom';
 
 export const APIFetch = async (path, method, body) => {
   const callContent = {
