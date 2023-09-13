@@ -87,14 +87,14 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
             "id": "999999",
             "last_updated": "loading"
         }
-        sessionStorage.clear()
-        let placeHolderReport = [ ... weeklyReports ]
+
+        let placeHolderReport = [... weeklyReports]
         placeHolderReport.unshift(placeHolder)
-        setWeeklyReports(placeHolderReport)
+        sessionStorage.setItem("weeklyReports", JSON.stringify(placeHolderReport))
         getWeeklyReports()
         await APIFetch("/api/weekly-reports/", "POST", data)
-        placeHolderReport.pop()
-        setWeeklyReports(placeHolderReport)
+        placeHolderReport.shift()
+        sessionStorage.clear()
         getWeeklyReports()
         setSnackbarMessage("SUCCESS: Add Weekly Report")
         setOpenSnackbar(true)
