@@ -99,16 +99,16 @@ function Home() {
           return renderImprovements(params.row.total_comments, params.row.total_improvement_comments, params.row.last_updated)
         }
     },
-    //   { field: 'total_favourites', width:185, 
-    //     renderHeader: () => {
-    //       return (
-    //         <Typography fontWeight="bold">Total Favourites</Typography>
-    //       )
-    //     },
-    //     renderCell: (params) => {
-    //       return renderImprovements(params.row.total_favourites, params.row.total_improvement_favourites, params.row.last_updated)
-    //     }
-    // },
+      { field: 'total_favourites', width:185, 
+        renderHeader: () => {
+          return (
+            <Typography fontWeight="bold">Total Favourites</Typography>
+          )
+        },
+        renderCell: (params) => {
+          return renderImprovements(params.row.total_favourites, params.row.total_improvement_favourites, params.row.last_updated)
+        }
+    },
       { field: 'last_updated', width:175,
       renderHeader: () => {
         return (
