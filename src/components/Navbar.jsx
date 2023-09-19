@@ -135,6 +135,7 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
     const logout = () => {
         localStorage.removeItem("token")
         navigate("/login")
+        sessionStorage.clear()
     }
 
     useEffect(() => {

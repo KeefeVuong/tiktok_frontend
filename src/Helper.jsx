@@ -6,7 +6,7 @@ export const APIFetch = async (path, method, body) => {
   const callContent = {
     method: method,
     headers: {
-      'Authorization': localStorage.getItem("token"),
+      'Authorization': `${localStorage.getItem("token")}`,
       // 'Authorization': 'Token 838fde2cfe52cf25e4aa5f6ac90f3ff8418f0c58',
       'Content-Type' : 'application/json',
     },
@@ -14,7 +14,7 @@ export const APIFetch = async (path, method, body) => {
   }
 
   try {
-    const response = await fetch(`https://www.keefe-tk-be.xyz${path}`, callContent);
+    const response = await fetch(`https://keefe-tk-be.xyz${path}`, callContent);
     // const response = await fetch(`http://127.0.0.1:8000${path}`, callContent);
     const data = await response.json();
     if (response.ok) {
