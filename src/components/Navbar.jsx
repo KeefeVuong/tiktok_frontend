@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from 'react';
 import { Box, Button, Typography, Modal, Toolbar, AppBar, TextField, Avatar } from '@mui/material';
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -38,6 +38,7 @@ const modalButtonStyle = {
 const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, getTiktoks, selected }) => {
     const location = useLocation()
     const navigate = useNavigate()
+
     const [snackbarMessage, setSnackbarMessage] = useState("")
     const [openSnackbar, setOpenSnackbar] = useState(false)
     const [navbarMode, setNavbarMode] = useState("home")
@@ -132,6 +133,10 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
         setOpenSnackbar(true)
     }
 
+    const addTiktok = async () => {
+
+    }
+
     const logout = () => {
         localStorage.removeItem("token")
         navigate("/login")
@@ -188,10 +193,13 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
                         </Button>
                     </>
                     :
-                    <Button onClick={refreshStats} color="inherit">
-                        <RefreshIcon sx={{paddingRight: "5px"}}/>
-                        REFRESH STATS
-                    </Button>
+                    <>
+                        {/* <Button onClick={refreshStats} color="inherit">
+                            <RefreshIcon sx={{paddingRight: "5px"}}/>
+                            REFRESH STATS
+                        </Button> */}
+                        
+                    </>
                     }
                 </Box>
             </Toolbar>
