@@ -111,7 +111,9 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
         for (let i in selected) {
             const tiktokData = await APIFetch(`/api/weekly-reports/${selected[i]}`, "GET")
             for (let j in tiktokData) {
-                urls.push(tiktokData[j]["url"])
+                if (!tiktokData[j]["manual"]) {
+                    urls.push(tiktokData[j]["url"])
+                }
             }
         }
         sessionStorage.clear()
@@ -160,7 +162,7 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
                 <Box>
                     {navbarMode === "home" ?
                     <Box sx={{display: "flex", alignItems: "center", gap: "10px"}}>
-                        <Avatar alt="Cheekyglo Logo" src={logo} component="span"/>
+                        <Avatar alt="Cheekyglo Logo" src={logo} component="a" href="https://www.tiktok.com/@cheekyglo" target="_blank"/>
                         <Typography variant="h6" component="span">
                             Tiktok Stats
                         </Typography>

@@ -1,5 +1,5 @@
 import { React, useState, useEffect } from 'react'
-import { Box, Button, TextField, Typography, Skeleton, Fab} from '@mui/material';
+import { Box, Button, IconButton, TextField, Typography, Switch, Fab, FormControlLabel, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,6 +10,7 @@ import { Autosave, useAutosave } from 'react-autosave';
 import { APIFetch, renderImprovements } from "../Helper.jsx"
 import Snackbar from "./Snackbar"
 import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const tiktok_stats_style = {
   height:"350px", 
@@ -25,6 +26,9 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
 
   const [notes, setNotes] = useState({})
   const [openSnackbar, setOpenSnackbar] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
+  const [toDelete, setToDelete] = useState("")
 
   const updateNotes = async () => {
     for (let tiktokId in notes) {
@@ -35,6 +39,11 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
       setNotes({})
     }
 
+  }
+  const deleteTiktok = async () => {
+    await APIFetch(`/api/tiktoks/${toDelete}`, "DELETE")
+
+    setOpenDeleteConfirmation(!openDeleteConfirmation)
   }
   useAutosave({ data: notes, onSave: updateNotes, interval: 1000 });
 
@@ -51,8 +60,11 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
               <Typography component="h2"><Box component="span" fontWeight="bold">Tiktok Statistics</Box></Typography>
             </TableCell>
             <TableCell>
-              <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
-              {/* <Button onClick={() => {setOpenWeeklyNotes(true)}}>Test</Button> */}
+              <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
+                <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
+                {/* <Button onClick={() => {setOpenWeeklyNotes(true)}}>Test</Button> */}
+                <FormControlLabel control={<Switch onChange={() => {setEditMode(!editMode)}}/>} label="Edit" />
+              </Box>
             </TableCell>
           </TableRow>
         </TableHead>
@@ -93,6 +105,12 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
                   setNotes(updatedNotes);
                 }}
                 />
+                {
+                  editMode &&
+                  <IconButton onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}} sx={{position: 'absolute', right: 1, top: 143, color: "#de8590"}}>
+                    <DeleteIcon/>
+                  </IconButton>
+                }
               </TableCell>
             </TableRow>
           ))}
@@ -104,6 +122,27 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
           <SaveIcon />
       </Fab>
     }
+
+    <Dialog
+      open={openDeleteConfirmation}
+      onClose={() => setOpenDeleteConfirmation(false)}
+    >
+      <DialogTitle>
+        {"Delete selected tiktok?"}
+      </DialogTitle>
+      <DialogContent>
+        <DialogContentText >
+          By confirming to DELETE, you must be aware that ALL data will be lost
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setOpenDeleteConfirmation(false)}>Cancel</Button>
+        <Button onClick={deleteTiktok} autoFocus>
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+
     <Snackbar open={openSnackbar} setOpen={setOpenSnackbar} message="SUCCESS: Saved Notes"/>
     </>
   )
