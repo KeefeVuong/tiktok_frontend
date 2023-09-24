@@ -114,6 +114,7 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
             }
         }
         sessionStorage.clear()
+        console.log(urls)
         await APIFetch("/api/tiktoks/", "PUT", {"urls": urls})
         getWeeklyReports()
         setSnackbarMessage("SUCCESS: Bulk Refresh Stats")

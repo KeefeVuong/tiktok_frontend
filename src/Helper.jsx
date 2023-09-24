@@ -4,6 +4,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 export const APIFetch = async (path, method, body) => {
   const callContent = {
+    mode: "cors",
     method: method,
     headers: {
       'Authorization': `${localStorage.getItem("token")}`,
