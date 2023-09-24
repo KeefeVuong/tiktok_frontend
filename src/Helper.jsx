@@ -15,8 +15,8 @@ export const APIFetch = async (path, method, body) => {
   }
 
   try {
-    const response = await fetch(`https://keefe-tk-be.xyz${path}`, callContent);
-    // const response = await fetch(`http://127.0.0.1:8000${path}`, callContent);
+    // const response = await fetch(`https://keefe-tk-be.xyz${path}`, callContent);
+    const response = await fetch(`http://127.0.0.1:8000${path}`, callContent);
     const data = await response.json();
     if (response.ok) {
       return Promise.resolve(data);
