@@ -20,7 +20,7 @@ function WeeklyReport() {
   const params = useParams();
   const [addTiktokForm, setAddTiktokForm] = useState({
     weekly_report: params.id,
-    thumbnail : "",
+    url: "",
     like_count: 0,
     view_count: 0,
     comment_count: 0,
@@ -37,8 +37,9 @@ function WeeklyReport() {
     //   "weekly_report": params.id,
     //   "url": addTiktokUrl
     // }
-    await APIFetch('/api/tiktoks/', 'POST', addTiktokForm)
     handleAddTiktok()
+    await APIFetch('/api/tiktoks/', 'POST', addTiktokForm)
+    getTiktoks()
   }
 
   const changeAddTiktokDetails = (e) => {
@@ -87,7 +88,7 @@ function WeeklyReport() {
   return (
     <>
       <Navbar tiktoks={tiktoks} getTiktoks={getTiktoks}/>
-      <Video tiktoks={tiktoks} setOpenWeeklyNotes={setOpenWeeklyNotes}/>
+      <Video tiktoks={tiktoks} getTiktoks={getTiktoks} setOpenWeeklyNotes={setOpenWeeklyNotes}/>
       <Fab onClick={handleAddTiktok} sx={{position: "fixed", bottom: "2%", right: "1%", backgroundColor: "#de8590", ".hover": {"backgroundColor": "#de8590"}}}>
             <AddIcon sx={{color: "white"}}/>
       </Fab>
@@ -135,6 +136,15 @@ function WeeklyReport() {
               onChange={changeAddTiktokDetails}
             />
           </Button> */}
+          <TextField
+              autoFocus
+              margin="dense"
+              label="Video URL"
+              name="url"
+              fullWidth
+              onChange={changeAddTiktokDetails}
+              variant="standard"
+          />
           <Box sx={addTiktokFormCountStyle}>
             <TextField
               autoFocus

@@ -22,7 +22,7 @@ const tiktok_stats_style = {
   justifyContent: "center"
 }
 
-function Video( {tiktoks, setOpenWeeklyNotes} ) {
+function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes} ) {
 
   const [notes, setNotes] = useState({})
   const [openSnackbar, setOpenSnackbar] = useState(false)
@@ -31,8 +31,9 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
   const [toDelete, setToDelete] = useState("")
 
   const updateNotes = async () => {
+
     for (let tiktokId in notes) {
-      await APIFetch(`/api/tiktoks/${tiktokId}`, "PUT", { "notes": notes[tiktokId] })
+      await APIFetch(`/api/tiktoks/${tiktokId}`, "PUT", { "notes": notes[tiktokId]["notes"], "hook": notes[tiktokId]["hook"] })
     }
     if (Object.keys(notes).length !== 0) {
       setOpenSnackbar(true)
@@ -40,11 +41,13 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
     }
 
   }
+
   const deleteTiktok = async () => {
     await APIFetch(`/api/tiktoks/${toDelete}`, "DELETE")
-
+    getTiktoks()
     setOpenDeleteConfirmation(!openDeleteConfirmation)
   }
+
   useAutosave({ data: notes, onSave: updateNotes, interval: 1000 });
 
   return (
@@ -63,7 +66,7 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
               <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
                 <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
                 {/* <Button onClick={() => {setOpenWeeklyNotes(true)}}>Test</Button> */}
-                <FormControlLabel control={<Switch onChange={() => {setEditMode(!editMode)}}/>} label="Edit" />
+                <FormControlLabel control={<Switch onChange={() => {setEditMode(!editMode)}}/>} label="Edit Mode" />
               </Box>
             </TableCell>
           </TableRow>
@@ -74,12 +77,14 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
               key={tiktok.id}
             >
               <TableCell>
-                <img 
-                alt="tiktok thumbnail" 
-                src={tiktok.thumbnail}
-                height="350px"
-                width="200px"
-                />
+                <a href={tiktok.url} target="_blank">
+                  <img 
+                  alt="tiktok thumbnail" 
+                  src={tiktok.thumbnail}
+                  height="350px"
+                  width="200px"
+                  />
+                </a>
               </TableCell>
               <TableCell>
                 <Box fontSize="17px" sx={tiktok_stats_style}>
@@ -93,25 +98,52 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
               </TableCell>
               <TableCell>
                 <TextField
+                label={tiktok.id in notes ? "Saving" : "Hook"}
                 multiline
-                rows={14}
+                fullWidth
+                rows={1}
+                size="small"
+                defaultValue={tiktok.hook}
+                onChange={(e) => {
+                  const updatedNotes = { ...notes };
+                  if (updatedNotes[tiktok.id] === undefined) {
+                    updatedNotes[tiktok.id] = {
+                      "notes": "",
+                      "hook": ""
+                    }
+                  }
+                  updatedNotes[tiktok.id]["hook"] = e.target.value;
+                  setNotes(updatedNotes);
+                }}
+                sx={{marginBottom: "20px"}}
+                />
+             
+                <TextField
+                multiline
+                rows={11}
                 fullWidth
                 sx={{color: "#f5ebed"}}
                 defaultValue={tiktok.notes}
-                label={tiktok.id in notes ? "Saving" : ""}
+                label={tiktok.id in notes ? "Saving" : "Notes"}
                 onChange={(e) => {
                   const updatedNotes = { ...notes };
-                  updatedNotes[tiktok.id] = e.target.value;
+                  if (updatedNotes[tiktok.id] === undefined) {
+                    updatedNotes[tiktok.id] = {
+                      "notes": "",
+                      "hook": ""
+                    }
+                  }
+                  updatedNotes[tiktok.id]["notes"] = e.target.value;
                   setNotes(updatedNotes);
                 }}
                 />
-                {
-                  editMode &&
-                  <IconButton onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}} sx={{position: 'absolute', right: 1, top: 143, color: "#de8590"}}>
-                    <DeleteIcon/>
-                  </IconButton>
-                }
               </TableCell>
+              {
+                editMode &&
+                <IconButton onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}} sx={{position: 'absolute', right: 1, color: "#de8590"}}>
+                  <DeleteIcon/>
+                </IconButton>
+              }
             </TableRow>
           ))}
         </TableBody>

@@ -18,16 +18,16 @@ const addModalStyle = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: "30%",
+    width: "250px",
     bgcolor: 'background.paper',
     boxShadow: 24,
     padding: "10px",
+    borderRadius: "10px"
 };
 
 const dateStyle = {
     display: "flex",
     justifyContent: "space-between",
-    marginBottom: "15px"
 }
 
 const modalButtonStyle = {
@@ -48,42 +48,22 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
         clearDates()
     }
 
-    const [startDate, setStartDate] = useState(null)
-    const [endDate, setEndDate] = useState(null)
+    const [numberOfVids, setNumberOfVids] = useState(0)
     const [title, setTitle] = useState("")
 
     const clearDates = () => {
-        setStartDate(null)
-        setEndDate(null)
+        setNumberOfVids(0)
         setTitle("")
     }
 
-    const submitDates = async () => {
-        // if (startDate == null || endDate == null) {
-        //     alert("Please ensure you have chosen a start and end date")
-        // }
-        // else if (startDate >= endDate) {
-        //     alert("Please ensure your start date comes before the end date")
-        // }
-        // else {
-        //     console.log("created weekly report")
-        //     handleAddModal()
-        // }
+    const createWeeklyReport = async () => {
+
         handleAddModal()
         const data = {
             "title": title,
-            "start_date": new Date(startDate).toLocaleDateString("fr-CA", {year:"numeric", month: "2-digit", day:"2-digit"}),
-            "end_date": new Date(endDate).toLocaleDateString("fr-CA", {year:"numeric", month: "2-digit", day:"2-digit"})
+            "number_of_videos": numberOfVids
         }
-        // if (weeklyReports.length !== 0) {
-        //     let lastReport = weeklyReports[weeklyReports.length - 1]
-        //     let endDate = Date.parse(lastReport["end_date"])
-        //     let now = new Date(new Date().toDateString()).getTime()
-        //     if (now <= endDate) {
-        //         alert("It hasn't been a week since the last weekly report")
-        //         return
-        //     }
-        // }   
+  
         const placeHolder = {
             "id": "999999",
             "last_updated": "loading"
@@ -133,10 +113,6 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
         getTiktoks()
         setSnackbarMessage("SUCCESS: Refresh Stats")
         setOpenSnackbar(true)
-    }
-
-    const addTiktok = async () => {
-
     }
 
     const logout = () => {
@@ -218,12 +194,19 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
             <Box sx={addModalStyle}>
                 <TextField
                 label="Title"
-                onChange={(e) => setTitle(e.target.value)}
                 fullWidth
-                sx={{marginBottom: "30px"}}
+                onChange={(e) => setTitle(e.target.value)}
+                sx={{marginBottom: "20px"}}
                 />
                 <Box sx={dateStyle}>
-                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
+                    <TextField
+                    label="Number of Videos"
+                    onChange={(e) => setNumberOfVids(e.target.value)}
+                    fullWidth
+                    type="number"
+                    sx={{marginBottom: "30px"}}
+                    />
+                    {/* <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
                         <DatePicker
                         value={startDate}
                         onChange={(value) => setStartDate(value)}
@@ -244,11 +227,11 @@ const NavBar = ({ weeklyReports, setWeeklyReports, getWeeklyReports, tiktoks, ge
                             },
                         }}
                         />
-                    </LocalizationProvider>
+                    </LocalizationProvider> */}
                 </Box>
                 <Box sx={modalButtonStyle}>
                     <Button onClick={clearDates}>Clear</Button>
-                    <Button variant="contained" onClick={submitDates}>Submit</Button>
+                    <Button variant="contained" onClick={createWeeklyReport}>Submit</Button>
                 </Box>
     
             </Box>
