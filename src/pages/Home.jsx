@@ -140,7 +140,7 @@ function Home() {
     }
     const weeklyReportData = await APIFetch("/api/weekly-reports/", "GET")
     sessionStorage.setItem("weeklyReports", JSON.stringify(weeklyReportData.reverse()))
-    setWeeklyReports(weeklyReportData.reverse())
+    setWeeklyReports(weeklyReportData)
     setSelected([])
   }
 
