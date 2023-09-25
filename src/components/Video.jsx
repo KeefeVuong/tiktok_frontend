@@ -43,9 +43,9 @@ function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes} ) {
   }
 
   const deleteTiktok = async () => {
+    setOpenDeleteConfirmation(!openDeleteConfirmation)
     await APIFetch(`/api/tiktoks/${toDelete}`, "DELETE")
     getTiktoks()
-    setOpenDeleteConfirmation(!openDeleteConfirmation)
   }
 
   useAutosave({ data: notes, onSave: updateNotes, interval: 1000 });
