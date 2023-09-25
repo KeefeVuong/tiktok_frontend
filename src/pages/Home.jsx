@@ -36,30 +36,30 @@ function Home() {
           )
         }
       },
-      { field: 'start_date', width: 150,
-        renderHeader: () => {
-          return (
-            <Typography fontWeight="bold">Start Date</Typography>
-          )
-        },
-        renderCell: (params) => {
-          if (params.row.last_updated === "loading") {
-            return <Skeleton animation="wave" width="100%" />
-          }
-        }
-      },
-      { field: 'end_date', width: 150,
-        renderHeader: () => {
-          return (
-            <Typography fontWeight="bold">End Date</Typography>
-          )
-        },
-        renderCell: (params) => {
-          if (params.row.last_updated === "loading") {
-            return <Skeleton animation="wave" width="100%" />
-          }
-        }
-      },
+      // { field: 'start_date', width: 150,
+      //   renderHeader: () => {
+      //     return (
+      //       <Typography fontWeight="bold">Start Date</Typography>
+      //     )
+      //   },
+      //   renderCell: (params) => {
+      //     if (params.row.last_updated === "loading") {
+      //       return <Skeleton animation="wave" width="100%" />
+      //     }
+      //   }
+      // },
+      // { field: 'end_date', width: 150,
+      //   renderHeader: () => {
+      //     return (
+      //       <Typography fontWeight="bold">End Date</Typography>
+      //     )
+      //   },
+      //   renderCell: (params) => {
+      //     if (params.row.last_updated === "loading") {
+      //       return <Skeleton animation="wave" width="100%" />
+      //     }
+      //   }
+      // },
       { field: 'total_views', width: 150,
         renderHeader: () => {
           return (
@@ -106,6 +106,9 @@ function Home() {
           )
         },
         renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
           return renderImprovements(params.row.total_favourites, params.row.total_improvement_favourites, params.row.last_updated)
         }
     },
