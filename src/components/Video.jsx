@@ -30,26 +30,17 @@ function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes, handleSnackbar} ) {
   const [toDelete, setToDelete] = useState("")
 
   const handleNotes = (tiktokID, type, newNote) => {
-      let updatedNotes = { ...notes };
-      if (updatedNotes[tiktokID] === undefined) {
-        updatedNotes[tiktokID] = {
-          "notes": "",
-          "hook": "",
-          "improvements": ""
-        }
-      }
-      updatedNotes[tiktokID][type] = newNote;
-      setNotes(updatedNotes);
+    let updatedNotes = { ...notes };
+    if (updatedNotes[tiktokID] === undefined) {
+      updatedNotes[tiktokID] = {}
+    }
+    updatedNotes[tiktokID][type] = newNote;
+    setNotes(updatedNotes);
   }
 
   const updateNotes = async () => {
     for (let tiktokId in notes) {
-        const data = {
-          "notes": notes[tiktokId]["notes"], 
-          "hook": notes[tiktokId]["hook"],
-          "improvements": notes[tiktokId]["improvements"]
-        }
-        await APIFetch(`/api/tiktoks/${tiktokId}`, "PUT", data)
+        await APIFetch(`/api/tiktoks/${tiktokId}`, "PUT", notes[tiktokId])
         .catch((e) => {
           console.error(e.message)
           handleSnackbar(true, "ERROR: Saved Notes")
