@@ -11,6 +11,7 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import ProtectedRoute from './components/ProtectedRoute';
 import useSnackbar from "./hooks/useSnackbar";
 import SuccessSnackbar from "./components/Snackbar";
+import AddAccount from "./pages/AddAccount";
 
 function App() {
   const {snackbar, handleSnackbar} = useSnackbar()
@@ -29,6 +30,7 @@ function App() {
             <Route path="/" element={<ProtectedRoute><Home handleSnackbar={handleSnackbar}/></ProtectedRoute>}/>
             <Route path="/login" element={<Login handleSnackbar={handleSnackbar}/>}/>
             <Route path="/weekly-report/:id" element={<ProtectedRoute><WeeklyReport handleSnackbar={handleSnackbar}/></ProtectedRoute>}/>
+            <Route path="/add-account" element={<ProtectedRoute><AddAccount handleSnackbar={handleSnackbar}/></ProtectedRoute>}/>
           </Routes>
         </Router>
         <SuccessSnackbar open={snackbar["open"]} handleSnackbar={handleSnackbar} message={snackbar["message"]}/>

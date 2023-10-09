@@ -33,7 +33,7 @@ function DeleteWeeklyReportBtn({selected, deleteWeeklyReports}) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleDeleteConfirmation}>Cancel</Button>
-                    <Button onClick={deleteWeeklyReports} autoFocus>
+                    <Button onClick={() => {handleDeleteConfirmation(); deleteWeeklyReports()}} autoFocus>
                     Delete
                     </Button>
                 </DialogActions>

@@ -1,19 +1,33 @@
-import { React, useState, useEffect } from 'react';
-import { Box, Button, Paper, Avatar, Menu, MenuItem } from '@mui/material';
+import { React, useState } from 'react';
+import { Button, Typography, Avatar, Menu, MenuItem, Divider,ListItemIcon } from '@mui/material';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import logo from "../assets/logo.jpg"
 import LogoutBtn from './LogoutBtn';
+import PersonAdd from '@mui/icons-material/PersonAdd';
+import Settings from '@mui/icons-material/Settings';
+import useAuth from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
+import SwitchAccount from './SwitchAccount';
+import SettingsForm from './SettingsForm';
 
 const profilePicStyle = {
-    marginRight: "7px",
-    height: "25px",
-    width: "25px"
-}
-
-const profileMenuStyle = {
+    marginRight: 0.75,
+    height: 32,
+    width: 32,
+    backgroundColor: "#f4be69"
 }
 
 function ProfileBtn() {
+    const {currentUser} = useAuth()
+    const [users, setUsers] = useState(JSON.parse(localStorage.getItem("users")) ?? [])
+    const [openSettingsModal, setOpenSettingsModal] = useState(false)
+    
+    const handleSettingsModal = () => {
+      setOpenSettingsModal(!openSettingsModal)
+    }
+
+    const navigate = useNavigate()
+
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (event) => {
@@ -23,22 +37,30 @@ function ProfileBtn() {
       setAnchorEl(null);
     };
 
+    const addAccountBtnClick = () => {
+      handleClose()
+      navigate("/add-account")
+    }
+
     return (
         <>
             <Button
             onClick={handleClick}
             color="inherit"
             >
-            <Avatar alt="Cheekyglo Logo" src={logo} sx={profilePicStyle}/>
-            Cheekyglo
+            {/* <Avatar alt="Cheekyglo Logo" src={logo} sx={profilePicStyle}/> */}
+            <Avatar sx={profilePicStyle}>
+              {currentUser.charAt(0)}
+            </Avatar>
+              {currentUser}
             <ArrowDropDownIcon/>
             </Button>
             <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            sx={profileMenuStyle}
-            slotProps={{
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              onClick={handleClose}
+              PaperProps={{
                 elevation: 0,
                 sx: {
                   overflow: 'visible',
@@ -66,12 +88,39 @@ function ProfileBtn() {
               }}
               transformOrigin={{ horizontal: 'right', vertical: 'top' }}
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            >
-                <MenuItem onClick={handleClose}><Avatar/> Test</MenuItem>
-                <MenuItem onClick={handleClose}><LogoutBtn/></MenuItem>
+      >
+        {users.map((user, i) => {
+          let name = Object.keys(user)[0]
+          let token = user[name]
+          return name !== currentUser ? (
+            <SwitchAccount key={i} user={name} token={token}/>
+          ) : null
+        })}
 
-            </Menu>
-        </>
+        {users.length <= 1 && 
+          <Typography sx={{textAlign: "center", marginBottom: "10px", marginTop: "5px"}}>
+            No other accounts
+          </Typography>
+        }
+
+        <Divider sx={{marginBottom: "10px"}}/>
+        <MenuItem onClick={addAccountBtnClick}>
+          <ListItemIcon>
+            <PersonAdd fontSize="small" />
+          </ListItemIcon>
+          Add another account
+        </MenuItem>
+        <MenuItem onClick={handleSettingsModal}>
+          <ListItemIcon>
+            <Settings fontSize="small"/>
+          </ListItemIcon>
+          Settings
+        </MenuItem>
+
+        <LogoutBtn/>
+      </Menu>
+      <SettingsForm openSettingsModal={openSettingsModal} handleSettingsModal={handleSettingsModal}/>
+      </>
     )
 }
 

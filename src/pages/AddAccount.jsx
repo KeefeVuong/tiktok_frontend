@@ -45,14 +45,14 @@ const mainButton  = {
   }
 }
 
-function Login({handleSnackbar}) {
+function AddAccount({handleSnackbar}) {
     const navigate = useNavigate()
+    const {currentUser} = useAuth()
     const [loginForm, setLoginForm] = useState({
       username: '',
       password: '',
     });
     const [showPassword, setShowPassword] = useState(false);
-    const {auth, setAuth} = useAuth();
 
     const changeLoginDetails = (e) => {
       const {name, value} = e.target;
@@ -66,29 +66,22 @@ function Login({handleSnackbar}) {
       e.preventDefault()
       await APIFetch("/api-token-auth/", "POST", loginForm)
       .then((data) => {
-          let users = JSON.parse(localStorage.getItem("users")) ?? []
-          let acc = {}
-          acc[loginForm["username"]] = `Token ${data.token}`
-          if (!users.some(user => JSON.stringify(user) === JSON.stringify(acc))) {
-            users.push(acc)
-          }
+            let users = JSON.parse(localStorage.getItem("users")) ?? []
+            let acc = {}
+            acc[loginForm["username"]] = `Token ${data.token}`
+            if (users.some(user => JSON.stringify(user) === JSON.stringify(acc))) {
+                handleSnackbar(true, "ERROR: Account already exists")
+                return
+            }
 
-          localStorage.setItem("token", `Token ${data.token}`);
-          localStorage.setItem("currentUser", loginForm["username"])
-          localStorage.setItem("users", JSON.stringify(users))
-          setAuth(true)
-          navigate("/");
+            users.push(acc)
+            localStorage.setItem("users", JSON.stringify(users))
+            navigate("/");
         }
       ).catch(() => {
         handleSnackbar(true, "ERROR: Incorrect Login Credentials")
       })
     }
-
-    useEffect(() => {
-        if (auth) {
-          navigate("/")
-        }
-    }, [])
 
  return (
     
@@ -126,4 +119,4 @@ function Login({handleSnackbar}) {
   );
 }
 
-export default Login
+export default AddAccount

@@ -1,5 +1,5 @@
-import { React, useState } from 'react';
-import { Box, Button, Modal, TextField } from '@mui/material';
+import { React, useState, useEffect } from 'react';
+import { Box, Button, Modal, TextField, InputAdornment, Tooltip } from '@mui/material';
 import { APIFetch } from '../Helper';
 
 const addModalStyle = {
@@ -22,8 +22,23 @@ const modalButtonStyle = {
 function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSuccessFetch, handlePlaceholderWeeklyReport }) {
     const [modalData, setModalData] = useState({
         number_of_videos: "",
-        title: ""
+        title: "",
+        tiktok_account: "Loading..."
     })
+
+    const getTiktokAccount = async () => {
+        await APIFetch("/api/client/", "GET")
+        .then((data) => {
+            setModalData({
+                ...modalData,
+                ["tiktok_account"]: data["tiktok_account"]
+            })
+        })
+        .catch((e) => {
+            console.error(e.message)
+            handleSnackbar(true, "ERROR: Get Tiktok Account")
+        })
+    }
 
     const changeModalDetails = (e) => {
         const {name, value} = e.target
@@ -41,8 +56,6 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
         })
     }
 
-
-
     const createWeeklyReport = async () => {
         handleAddModal()
   
@@ -58,8 +71,11 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
             console.error(e.message)
             handleSnackbar(true, "ERROR: Add Weekly Report")
         })
-
     }
+
+    useEffect(() => {
+        openAddModal === true ? getTiktokAccount() : null
+    }, [openAddModal])
 
     return (
         <Modal
@@ -67,6 +83,17 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
         onClose={handleAddModal}
         >
             <Box sx={addModalStyle}>
+                <Tooltip title="Edit Tiktok account in settings" placement="bottom" arrow>
+                    <TextField
+                    sx={{ marginBottom: "20px" }}
+                    InputProps={{
+                        startAdornment: <InputAdornment position="start">@</InputAdornment>,
+                    }}
+                    disabled
+                    value={modalData["tiktok_account"]}
+                    />
+                </Tooltip>
+
                 <TextField
                 label="Title"
                 name="title"

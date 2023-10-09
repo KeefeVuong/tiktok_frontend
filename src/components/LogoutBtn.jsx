@@ -1,24 +1,25 @@
 import React from 'react'
-import LogoutIcon from '@mui/icons-material/Logout';
+import Logout from '@mui/icons-material/Logout';
 import { useNavigate } from "react-router-dom";
-import { Button } from '@mui/material';
-import useAuth from '../hooks/useAuth';
+import { MenuItem, ListItemIcon } from '@mui/material';
 
 function LogoutBtn() {
     const navigate = useNavigate()
-    const {setAuth} = useAuth()
 
     const logout = () => {
         localStorage.removeItem("token")
+        localStorage.removeItem("currentUser")
         sessionStorage.clear()
         navigate("/login")
     }
 
     return (
-        <Button onClick={logout} color="inherit">
-            <LogoutIcon fontSize="small" sx={{paddingRight: "5px"}}/>
-            LOGOUT
-        </Button>
+        <MenuItem onClick={logout}>
+            <ListItemIcon>
+                <Logout fontSize="small"/>
+            </ListItemIcon>
+            Logout
+        </MenuItem>
     )
 }
 

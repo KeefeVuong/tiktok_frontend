@@ -7,12 +7,12 @@ import logo from "../assets/logo.jpg"
 import CustomModal from './CustomModal';
 import BulkRefreshBtn from './BulkRefreshBtn';
 import LogoutBtn from './LogoutBtn';
-import ProfileBtn from "./ProfileBtn"
+import ProfileBtn from "./ProfileBtn";
 
 
 const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => {
     const location = useLocation()
-
+    
     const [navbarMode, setNavbarMode] = useState("home")
     const [openAddModal, setOpenAddModal] = useState(false)
 
