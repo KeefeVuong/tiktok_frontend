@@ -7,6 +7,7 @@ import logo from "../assets/logo.jpg"
 import CustomModal from './CustomModal';
 import BulkRefreshBtn from './BulkRefreshBtn';
 import LogoutBtn from './LogoutBtn';
+import ProfileBtn from "./ProfileBtn"
 
 
 const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => {
@@ -68,7 +69,7 @@ const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => 
                         </Button>
                         }
                     </Box>
-                    <Box>
+                    <Box sx={{display: "flex", alignItems: "center", justifyContent: "flex-end"}}>
                         {navbarMode === "home" ?
                         <>
                             <Button onClick={handleAddModal} color="inherit">
@@ -77,8 +78,10 @@ const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => 
                             </Button>
                             |
                             <BulkRefreshBtn selected={selected} handleSuccessFetch={handleSuccessFetch}/>
+                            {/* |
+                            <LogoutBtn/> */}
                             |
-                            <LogoutBtn/>
+                            <ProfileBtn/>
                         </>
                         :
                         <>

@@ -1,17 +1,12 @@
 import { React, useState, useEffect, useRef } from 'react'
-import { Dialog, Fab, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button, Box } from '@mui/material';
+import { Dialog, Fab } from '@mui/material';
 import Video from "../components/Video"
 import Navbar from "../components/Navbar"
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { APIFetch } from "../Helper.jsx"
 import { Editor } from '@tinymce/tinymce-react';
 import AddIcon from '@mui/icons-material/Add';
-
-const addTiktokFormCountStyle = {
-  display: "flex",
-  justifyContent: "space-around",
-  gap: "10%"
-}
+import AddTiktokForm from '../components/AddTiktokForm';
 
 function WeeklyReport({handleSnackbar}) {
   const params = useParams();
@@ -19,43 +14,10 @@ function WeeklyReport({handleSnackbar}) {
   const [tiktoks, setTiktoks] = useState([])
   const [openWeeklyNotes, setOpenWeeklyNotes] = useState(false)
   const [openAddTiktok, setOpenAddTiktok] = useState(false)
-  const [addTiktokForm, setAddTiktokForm] = useState({
-    weekly_report: params.id,
-    url: "",
-    like_count: 0,
-    view_count: 0,
-    comment_count: 0,
-    favourite_count: 0,
-  });
-  const navigate = useNavigate()
 
   const handleAddTiktok = () => {
     setOpenAddTiktok(!openAddTiktok)
   }
-
-  const addTiktok = async () => {
-    // const body = {
-    //   "weekly_report": params.id,
-    //   "url": addTiktokUrl
-    // }
-    handleAddTiktok()
-    await APIFetch('/api/tiktoks/', 'POST', addTiktokForm)
-    .then(() => getTiktoks())
-    .catch((e) => {
-      console.error(e.message)
-      handleSnackbar(true, "ERROR: Add Tiktok")
-    })
-  }
-
-  const changeAddTiktokDetails = (e) => {
-    const {name, value} = e.target;
-
-    setAddTiktokForm({
-      ...addTiktokForm,
-      [name]: value,
-    })
-  }
-
 
   const getTiktoks = async () => {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
@@ -81,7 +43,7 @@ function WeeklyReport({handleSnackbar}) {
   return (
     <>
       <Navbar tiktoks={tiktoks} getTiktoks={getTiktoks}/>
-      <Video tiktoks={tiktoks} getTiktoks={getTiktoks} setOpenWeeklyNotes={setOpenWeeklyNotes}/>
+      <Video tiktoks={tiktoks} getTiktoks={getTiktoks} setOpenWeeklyNotes={setOpenWeeklyNotes} handleSnackbar={handleSnackbar}/>
       <Fab onClick={handleAddTiktok} sx={{position: "fixed", bottom: "2%", right: "1%", backgroundColor: "#de8590", ".hover": {"backgroundColor": "#de8590"}}}>
             <AddIcon sx={{color: "white"}}/>
       </Fab>
@@ -111,80 +73,11 @@ function WeeklyReport({handleSnackbar}) {
         /> */}
       </Dialog>
 
-      <Dialog open={openAddTiktok} onClose={handleAddTiktok}>
-        <DialogTitle>Manually Add Tiktok</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            
-          </DialogContentText>
-          {/* <Button
-            variant="contained"
-            component="label"
-          >
-            Upload Thumbnail
-            <input
-              type="file"
-              hidden
-              name="thumbnail"
-              onChange={changeAddTiktokDetails}
-            />
-          </Button> */}
-          <TextField
-              autoFocus
-              margin="dense"
-              label="Video URL"
-              name="url"
-              fullWidth
-              onChange={changeAddTiktokDetails}
-              variant="standard"
-          />
-          <Box sx={addTiktokFormCountStyle}>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="View Count"
-              type="number"
-              name="view_count"
-              onChange={changeAddTiktokDetails}
-              variant="standard"
-            />
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Like Count"
-              name="like_count"
-              type="number"
-              onChange={changeAddTiktokDetails}
-              variant="standard"
-            />
-
-          </Box>
-          <Box sx={addTiktokFormCountStyle}>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Comment Count"
-              name="comment_count"
-              type="number"
-              onChange={changeAddTiktokDetails}
-              variant="standard"
-            />
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Favourite Count"
-              name="favourite_count"
-              type="number"
-              onChange={changeAddTiktokDetails}
-              variant="standard"
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleAddTiktok}>Cancel</Button>
-          <Button onClick={addTiktok}>Add Tiktok</Button>
-        </DialogActions>
-      </Dialog>
+      <AddTiktokForm
+      openAddTiktok={openAddTiktok}
+      handleAddTiktok={handleAddTiktok}
+      getTiktoks={getTiktoks}
+      />
     </>
   )
 }

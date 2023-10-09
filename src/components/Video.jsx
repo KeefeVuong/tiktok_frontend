@@ -1,5 +1,5 @@
-import { React, useState, useEffect } from 'react'
-import { Box, Button, IconButton, TextField, Typography, Switch, Fab, FormControlLabel, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
+import { React, useState } from 'react'
+import { Box, IconButton, TextField, Typography, Switch, Fab, FormControlLabel } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,44 +8,58 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { Autosave, useAutosave } from 'react-autosave';
 import { APIFetch, renderImprovements } from "../Helper.jsx"
-import Snackbar from "./Snackbar"
-import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteTiktokForm from "./DeleteTiktokForm";
 
 const tiktok_stats_style = {
-  height:"350px", 
+  height:"375px", 
   backgroundColor: "#f5ebed", 
   border: "1px solid #f2e6e8",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
+  width: "200px"
 }
 
-function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes} ) {
+function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes, handleSnackbar} ) {
 
   const [notes, setNotes] = useState({})
-  const [openSnackbar, setOpenSnackbar] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
   const [toDelete, setToDelete] = useState("")
 
-  const updateNotes = async () => {
+  const handleNotes = (tiktokID, type, newNote) => {
+      let updatedNotes = { ...notes };
+      if (updatedNotes[tiktokID] === undefined) {
+        updatedNotes[tiktokID] = {
+          "notes": "",
+          "hook": "",
+          "improvements": ""
+        }
+      }
+      updatedNotes[tiktokID][type] = newNote;
+      setNotes(updatedNotes);
+  }
 
+  const updateNotes = async () => {
     for (let tiktokId in notes) {
-      await APIFetch(`/api/tiktoks/${tiktokId}`, "PUT", { "notes": notes[tiktokId]["notes"], "hook": notes[tiktokId]["hook"] })
+        const data = {
+          "notes": notes[tiktokId]["notes"], 
+          "hook": notes[tiktokId]["hook"],
+          "improvements": notes[tiktokId]["improvements"]
+        }
+        await APIFetch(`/api/tiktoks/${tiktokId}`, "PUT", data)
+        .catch((e) => {
+          console.error(e.message)
+          handleSnackbar(true, "ERROR: Saved Notes")
+        })
     }
     if (Object.keys(notes).length !== 0) {
-      setOpenSnackbar(true)
+      handleSnackbar(true, "SUCCESS: Saved Notes")
       setNotes({})
     }
 
-  }
-
-  const deleteTiktok = async () => {
-    setOpenDeleteConfirmation(!openDeleteConfirmation)
-    await APIFetch(`/api/tiktoks/${toDelete}`, "DELETE")
-    getTiktoks()
   }
 
   useAutosave({ data: notes, onSave: updateNotes, interval: 1000 });
@@ -81,7 +95,7 @@ function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes} ) {
                   <img 
                   alt="tiktok thumbnail" 
                   src={tiktok.thumbnail}
-                  height="350px"
+                  height="375px"
                   width="200px"
                   />
                 </a>
@@ -97,85 +111,61 @@ function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes} ) {
                 </Box>
               </TableCell>
               <TableCell>
-                <TextField
-                label={tiktok.id in notes ? "Saving" : "Hook"}
-                multiline
-                fullWidth
-                rows={1}
-                size="small"
-                defaultValue={tiktok.hook}
-                onChange={(e) => {
-                  const updatedNotes = { ...notes };
-                  if (updatedNotes[tiktok.id] === undefined) {
-                    updatedNotes[tiktok.id] = {
-                      "notes": "",
-                      "hook": ""
-                    }
-                  }
-                  updatedNotes[tiktok.id]["hook"] = e.target.value;
-                  setNotes(updatedNotes);
-                }}
-                sx={{marginBottom: "20px"}}
-                />
-             
-                <TextField
-                multiline
-                rows={11}
-                fullWidth
-                sx={{color: "#f5ebed"}}
-                defaultValue={tiktok.notes}
-                label={tiktok.id in notes ? "Saving" : "Notes"}
-                onChange={(e) => {
-                  const updatedNotes = { ...notes };
-                  if (updatedNotes[tiktok.id] === undefined) {
-                    updatedNotes[tiktok.id] = {
-                      "notes": "",
-                      "hook": ""
-                    }
-                  }
-                  updatedNotes[tiktok.id]["notes"] = e.target.value;
-                  setNotes(updatedNotes);
-                }}
-                />
+                <Box>
+
+                  <TextField
+                  label={tiktok.id in notes ? "Saving" : "Hook"}
+                  multiline
+                  fullWidth
+                  rows={1}
+                  size="small"
+                  defaultValue={tiktok.hook}
+                  onChange={(e) => handleNotes(tiktok.id, "hook", e.target.value)}
+                  sx={{marginBottom: "20px"}}
+                  />
+              
+                  <TextField
+                  multiline
+                  rows={5}
+                  fullWidth
+                  defaultValue={tiktok.notes}
+                  label={tiktok.id in notes ? "Saving" : "Notes"}
+                  onChange={(e) => handleNotes(tiktok.id, "notes", e.target.value)}
+                  sx={{color: "#f5ebed", marginBottom: "20px"}}
+                  />
+
+                  <TextField
+                  multiline
+                  rows={5}
+                  fullWidth
+                  sx={{color: "#f5ebed"}}
+                  defaultValue={tiktok.improvements}
+                  label={tiktok.id in notes ? "Saving" : "Improvements"}
+                  onChange={(e) => handleNotes(tiktok.id, "improvements", e.target.value)}
+                  />
+                </Box>
               </TableCell>
-              {
-                editMode &&
-                <IconButton onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}} sx={{position: 'absolute', right: 1, color: "#de8590"}}>
-                  <DeleteIcon/>
-                </IconButton>
-              }
+              <TableCell sx={{position: 'absolute', right: 0, borderBottom: 0}}>
+                {
+                  editMode &&
+                  <IconButton onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}} sx={{position: 'absolute', right: 0.01, color: "#de8590"}}>
+                    <DeleteIcon/>
+                  </IconButton>
+                }
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
-    {Object.keys(notes).length !== 0 &&
-      <Fab onClick={updateNotes} color="primary" sx={{position: "fixed", bottom: 20, right: 20}}>
-          <SaveIcon />
-      </Fab>
-    }
 
-    <Dialog
-      open={openDeleteConfirmation}
-      onClose={() => setOpenDeleteConfirmation(false)}
-    >
-      <DialogTitle>
-        {"Delete selected tiktok?"}
-      </DialogTitle>
-      <DialogContent>
-        <DialogContentText >
-          By confirming to DELETE, you must be aware that ALL data will be lost
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setOpenDeleteConfirmation(false)}>Cancel</Button>
-        <Button onClick={deleteTiktok} autoFocus>
-          Delete
-        </Button>
-      </DialogActions>
-    </Dialog>
-
-    <Snackbar open={openSnackbar} setOpen={setOpenSnackbar} message="SUCCESS: Saved Notes"/>
+    <DeleteTiktokForm
+    openDeleteConfirmation={openDeleteConfirmation}
+    setOpenDeleteConfirmation={setOpenDeleteConfirmation}
+    toDelete={toDelete}
+    getTiktoks={getTiktoks}
+    handleSnackbar={handleSnackbar}
+    />
     </>
   )
 }
