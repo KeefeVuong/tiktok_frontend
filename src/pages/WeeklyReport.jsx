@@ -13,11 +13,12 @@ const addTiktokFormCountStyle = {
   gap: "10%"
 }
 
-function WeeklyReport() {
+function WeeklyReport({handleSnackbar}) {
+  const params = useParams();
+
   const [tiktoks, setTiktoks] = useState([])
   const [openWeeklyNotes, setOpenWeeklyNotes] = useState(false)
   const [openAddTiktok, setOpenAddTiktok] = useState(false)
-  const params = useParams();
   const [addTiktokForm, setAddTiktokForm] = useState({
     weekly_report: params.id,
     url: "",
@@ -39,24 +40,30 @@ function WeeklyReport() {
     // }
     handleAddTiktok()
     await APIFetch('/api/tiktoks/', 'POST', addTiktokForm)
-    getTiktoks()
+    .then(() => getTiktoks())
+    .catch((e) => {
+      console.error(e.message)
+      handleSnackbar(true, "ERROR: Add Tiktok")
+    })
   }
 
   const changeAddTiktokDetails = (e) => {
     const {name, value} = e.target;
 
-  
     setAddTiktokForm({
       ...addTiktokForm,
       [name]: value,
     })
-    
   }
 
 
   const getTiktoks = async () => {
-    const tiktokData = (await APIFetch(`/api/weekly-reports/${params.id}`, "GET")).reverse()
-    setTiktoks(tiktokData)
+    await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
+    .then((tiktokData) => setTiktoks(tiktokData.reverse()))
+    .catch((e) => {
+      console.error(e.message)
+      handleSnackbar(true, "ERROR: Get Tiktok Data")
+    })
   }
 
   const editorRef = useRef(null);
@@ -66,21 +73,7 @@ function WeeklyReport() {
     }
   };
 
-  const checkAuth = async () => {
-    if (localStorage.getItem("token") !== null) {
-      await APIFetch("/api/login/", "POST")
-      .catch(() => {
-          localStorage.removeItem("token")
-          navigate("/login")
-      })
-    }
-    else {
-      navigate("/login")
-    }
-  }
-
   useEffect(() => {
-    checkAuth()
     getTiktoks()
 
   }, [])

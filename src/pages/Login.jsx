@@ -4,53 +4,55 @@ import LoginIcon from '@mui/icons-material/Login';
 import {
     useNavigate
   } from 'react-router-dom';
-  import { APIFetch } from "../Helper.jsx"
-  import logo from "../assets/logo.jpg"
-  import VisibilityIcon from '@mui/icons-material/Visibility';
-  import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { APIFetch } from "../Helper.jsx"
+import logo from "../assets/logo.jpg"
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import useAuth from '../hooks/useAuth.jsx';
 
-  const containerStyle = {
-    height: '100vh',
-    display: 'flex',  
-    flexDirection: "column",
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: "center",
-    backgroundColor: "#e6929c",
-    width: "100vw",
-  }
-  
-  const boxStyle = {
-    marginTop: "2rem",
-  }
-  
-  const paperStyle = {
-    marginTop: "-5rem",
-    padding: "2rem",
-    width: "20%",
-    minWidth: "300px",
-  }
-  
-  const inputStyle = {
-    width: "100%",
-    marginBottom: "1rem",
-  }
-  
-  const mainButton  = {
-    width: "100%",
-    backgroundColor: "#e6929c",
-    ":hover": {
-      backgroundColor: "#e6929c",
-    }
-  }
+const containerStyle = {
+  height: '100vh',
+  display: 'flex',  
+  flexDirection: "column",
+  alignItems: 'center',
+  justifyContent: 'center',
+  textAlign: "center",
+  backgroundColor: "#e6929c",
+  width: "100vw",
+}
 
-function Login() {
+const boxStyle = {
+  marginTop: "2rem",
+}
+
+const paperStyle = {
+  marginTop: "-5rem",
+  padding: "2rem",
+  width: "20%",
+  minWidth: "300px",
+}
+
+const inputStyle = {
+  width: "100%",
+  marginBottom: "1rem",
+}
+
+const mainButton  = {
+  width: "100%",
+  backgroundColor: "#e6929c",
+  ":hover": {
+    backgroundColor: "#e6929c",
+  }
+}
+
+function Login({handleSnackbar}) {
     const navigate = useNavigate()
     const [loginForm, setLoginForm] = useState({
       username: '',
       password: '',
     });
     const [showPassword, setShowPassword] = useState(false);
+    const {auth, setAuth} = useAuth();
 
     const changeLoginDetails = (e) => {
       const {name, value} = e.target;
@@ -60,29 +62,24 @@ function Login() {
       })
     }
 
-    const checkAuth = async () => {
-        if (localStorage.getItem("token") !== null) {
-            await APIFetch("/api/login/", "POST")
-            .then(() => {
-                navigate("/")
-            })
-        }
-    }
-
     const submitForm = async (e) => {
       e.preventDefault()
       await APIFetch("/api-token-auth/", "POST", loginForm)
       .then((data) => {
           localStorage.setItem("token", `Token ${data.token}`);
+          setAuth(true)
           navigate("/");
         }
-      ).catch((err) => alert(err["non_field_errors"]))
+      ).catch(() => {
+        handleSnackbar(true, "ERROR: Incorrect Login Credentials")
+      })
     }
 
     useEffect(() => {
-        checkAuth()
+        if (auth) {
+          navigate("/")
+        }
     }, [])
-
 
  return (
     

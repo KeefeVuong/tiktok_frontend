@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import "./App.css"
 import {
   HashRouter as Router,
@@ -9,8 +8,13 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import WeeklyReport from './pages/WeeklyReport'
 import { createTheme, ThemeProvider } from '@mui/material';
+import ProtectedRoute from './components/ProtectedRoute';
+import useSnackbar from "./hooks/useSnackbar";
+import SuccessSnackbar from "./components/Snackbar";
 
 function App() {
+  const {snackbar, handleSnackbar} = useSnackbar()
+
   const theme = createTheme({
     typography: {
       fontFamily: [
@@ -22,12 +26,12 @@ function App() {
     <ThemeProvider theme={theme}>
         <Router>
           <Routes>
-            <Route path="/" element={<Home/>}/>
-            <Route path="/login" element={<Login/>}/>
-            <Route path="/weekly-report/:id" element={<WeeklyReport/>}/>
+            <Route path="/" element={<ProtectedRoute><Home handleSnackbar={handleSnackbar}/></ProtectedRoute>}/>
+            <Route path="/login" element={<Login handleSnackbar={handleSnackbar}/>}/>
+            <Route path="/weekly-report/:id" element={<ProtectedRoute><WeeklyReport handleSnackbar={handleSnackbar}/></ProtectedRoute>}/>
           </Routes>
         </Router>
-
+        <SuccessSnackbar open={snackbar["open"]} handleSnackbar={handleSnackbar} message={snackbar["message"]}/>
     </ThemeProvider>
   )
 }
