@@ -26,15 +26,21 @@ const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => 
         handleSnackbar(true, message)
     }
 
-    const handlePlaceholderWeeklyReport = () => {
-        const placeHolder = {
-            "id": "999999",
-            "last_updated": "loading"
+    const handlePlaceholderWeeklyReport = (mode) => {
+        if (mode === "setup") {
+            const placeHolder = {
+                "id": "999999",
+                "last_updated": "loading"
+            }
+    
+            let placeHolderReport = [... weeklyReports]
+            placeHolderReport.unshift(placeHolder)
+            sessionStorage.setItem("weeklyReports", JSON.stringify(placeHolderReport))
         }
-
-        let placeHolderReport = [... weeklyReports]
-        placeHolderReport.unshift(placeHolder)
-        sessionStorage.setItem("weeklyReports", JSON.stringify(placeHolderReport))
+        else {
+            sessionStorage.setItem("weeklyReports", JSON.stringify(weeklyReports))
+        }
+        
         getWeeklyReports()
     }
 
@@ -77,7 +83,7 @@ const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => 
                                 ADD WEEKLY REPORT
                             </Button>
                             |
-                            <BulkRefreshBtn selected={selected} handleSuccessFetch={handleSuccessFetch}/>
+                            <BulkRefreshBtn selected={selected} handleSnackbar={handleSnackbar} handleSuccessFetch={handleSuccessFetch}/>
                             {/* |
                             <LogoutBtn/> */}
                             |
@@ -99,6 +105,7 @@ const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => 
         handleSnackbar={handleSnackbar}
         handlePlaceholderWeeklyReport={handlePlaceholderWeeklyReport}
         handleSuccessFetch={handleSuccessFetch}
+        weeklyReports={weeklyReports}
         />
         </>
     );
