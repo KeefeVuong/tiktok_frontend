@@ -136,7 +136,7 @@ function Home({handleSnackbar}) {
     </Box>
 
     <DeleteWeeklyReportBtn selected={selected} deleteWeeklyReports={deleteWeeklyReports}/>
-    <LoadingBackdrop loading={loading}/>
+    <LoadingBackdrop loading={loading} message={"Loading Weekly Report"}/>
     </>
   )
 }

@@ -2,8 +2,10 @@ import { React, useState } from 'react';
 import { Box, Button, Modal, TextField } from '@mui/material';
 import { APIFetch } from '../Helper';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import LoadingBackdrop from './LoadingBackdrop';
 
-function BulkRefreshBtn({ selected, handleSuccessFetch }) {
+function BulkRefreshBtn({ selected, handleSnackbar, handleSuccessFetch }) {
+    const [loading, setLoading] = useState(false)
 
     const bulkRefreshStats = async () => {
         if (selected.length === 0) {
@@ -11,20 +13,23 @@ function BulkRefreshBtn({ selected, handleSuccessFetch }) {
             return
         }
 
+        setLoading(true)
         let urls = []
         for (let i in selected) {
-            const tiktokData = await APIFetch(`/api/weekly-reports/${selected[i]}`, "GET")
+            await APIFetch(`/api/weekly-reports/${selected[i]}`, "GET")
+            .then((tiktokData) => {
+                for (let j in tiktokData) {
+                    if (!tiktokData[j]["manual"]) {
+                        urls.push(tiktokData[j]["url"])
+                    }
+                }
+            })
             .catch((e) => {
                 console.error(e.message)
                 handleSnackbar(true, "ERROR: Get Tiktok Urls")
             })
-            for (let j in tiktokData) {
-                if (!tiktokData[j]["manual"]) {
-                    urls.push(tiktokData[j]["url"])
-                }
-            }
         }
-
+        
         await APIFetch("/api/tiktoks/", "PUT", {"urls": urls})
         .then(() => {
             handleSuccessFetch("SUCCESS: Bulk Refresh Stats")
@@ -33,13 +38,19 @@ function BulkRefreshBtn({ selected, handleSuccessFetch }) {
             console.error(e.message)
             handleSnackbar(true, "ERROR: Bulk Refresh Stats")
         })
+
+        setLoading(false)
     }
 
     return (
-        <Button onClick={bulkRefreshStats} color="inherit">
-            <RefreshIcon sx={{paddingRight: "5px"}}/>
-            BULK REFRESH STATS
-        </Button>
+        <>
+            <Button onClick={bulkRefreshStats} color="inherit">
+                <RefreshIcon sx={{paddingRight: "5px"}}/>
+                BULK REFRESH STATS
+            </Button>
+
+            <LoadingBackdrop loading={loading} message={"Bulk Refreshing Tiktok Stats"}/>
+        </>
     )
 }
 
