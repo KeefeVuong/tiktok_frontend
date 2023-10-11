@@ -98,6 +98,8 @@ function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes, handleSnackbar} ) {
                     <Box>{renderImprovements(tiktok.like_count, tiktok.improvement_like_count, tiktok.last_updated, true, "Likes")}</Box>
                     <Box>{renderImprovements(tiktok.comment_count, tiktok.improvement_comment_count, tiktok.last_updated, true, "Comments")}</Box>
                     <Box>{renderImprovements(tiktok.favourite_count, tiktok.improvement_favourite_count, tiktok.last_updated, true, "Favourites")}</Box>
+                    <br/>
+                    <Box> <Box fontWeight={"bold"} component="span">{((tiktok.like_count + tiktok.comment_count +tiktok.share_count) / tiktok.view_count).toFixed(2)}%</Box> Engagement</Box>
                   </Box>
                 </Box>
               </TableCell>

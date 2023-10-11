@@ -28,16 +28,22 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
         handleSnackbar(true, message);
     }
 
-    const handlePlaceholderWeeklyReport = () => {
-        const placeHolder = {
-            "id": "999999",
-            "last_updated": "loading"
+    const handlePlaceholderWeeklyReport = (mode) => {
+        if (mode === "setup") {
+            const placeHolder = {
+                "id": "999999",
+                "last_updated": "loading"
+            }
+    
+            let placeHolderReport = [... weeklyReports]
+            placeHolderReport.unshift(placeHolder)
+            sessionStorage.setItem("weeklyReports", JSON.stringify(placeHolderReport))
         }
-
-        let placeHolderReport = [...weeklyReports];
-        placeHolderReport.unshift(placeHolder);
-        sessionStorage.setItem("weeklyReports", JSON.stringify(placeHolderReport));
-        getWeeklyReports();
+        else {
+            sessionStorage.setItem("weeklyReports", JSON.stringify(weeklyReports))
+        }
+        
+        getWeeklyReports()
     }
 
     const handleMenuOpen = (event) => {
@@ -150,13 +156,14 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
                 ) : null}
             </Menu>
 
-            <CustomModal 
-                handleAddModal={handleAddModal} 
-                openAddModal={openAddModal} 
-                handleSnackbar={handleSnackbar}
-                handlePlaceholderWeeklyReport={handlePlaceholderWeeklyReport}
-                handleSuccessFetch={handleSuccessFetch}
-            />
+        <CustomModal 
+        handleAddModal={handleAddModal} 
+        openAddModal={openAddModal} 
+        handleSnackbar={handleSnackbar}
+        handlePlaceholderWeeklyReport={handlePlaceholderWeeklyReport}
+        handleSuccessFetch={handleSuccessFetch}
+        weeklyReports={weeklyReports}
+        />
         </>
     );
 }

@@ -19,7 +19,7 @@ const modalButtonStyle = {
     justifyContent: "space-between"
 }
 
-function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSuccessFetch, handlePlaceholderWeeklyReport }) {
+function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSuccessFetch, handlePlaceholderWeeklyReport, weeklyReports }) {
     const [modalData, setModalData] = useState({
         number_of_videos: "",
         title: "",
@@ -60,17 +60,20 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
         handleAddModal()
   
         // temp work around to session storage, getweeklyreport sets if not empty.
-        handlePlaceholderWeeklyReport()
+        handlePlaceholderWeeklyReport("setup")
 
         await APIFetch("/api/weekly-reports/", "POST", modalData)
         .then(() => {
-            handleSuccessFetch("SUCCESS: Bulk Refresh Stats")
+            handleSuccessFetch("SUCCESS: Add Weekly Report")
             clearModalData()
         })
         .catch((e) => {
             console.error(e.message)
             handleSnackbar(true, "ERROR: Add Weekly Report")
+            handlePlaceholderWeeklyReport("reset")
         })
+    
+
     }
 
     useEffect(() => {
@@ -89,6 +92,7 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
                     InputProps={{
                         startAdornment: <InputAdornment position="start">@</InputAdornment>,
                     }}
+                    fullWidth
                     disabled
                     value={modalData["tiktok_account"]}
                     />
