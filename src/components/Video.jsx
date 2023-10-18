@@ -70,7 +70,6 @@ function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes, handleSnackbar} ) {
             <TableCell>
               <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
                 <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
-                {/* <Button onClick={() => {setOpenWeeklyNotes(true)}}>Test</Button> */}
                 <FormControlLabel control={<Switch onChange={() => {setEditMode(!editMode)}}/>} label="Edit Mode" />
               </Box>
             </TableCell>
