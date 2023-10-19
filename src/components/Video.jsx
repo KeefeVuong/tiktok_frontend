@@ -22,10 +22,9 @@ const tiktok_stats_style = {
   width: "200px"
 }
 
-function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes, handleSnackbar} ) {
+function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes, handleSnackbar, editMode} ) {
 
   const [notes, setNotes] = useState({})
-  const [editMode, setEditMode] = useState(false)
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
   const [toDelete, setToDelete] = useState("")
 
@@ -70,7 +69,6 @@ function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes, handleSnackbar} ) {
             <TableCell>
               <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
                 <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
-                <FormControlLabel control={<Switch onChange={() => {setEditMode(!editMode)}}/>} label="Edit Mode" />
               </Box>
             </TableCell>
           </TableRow>

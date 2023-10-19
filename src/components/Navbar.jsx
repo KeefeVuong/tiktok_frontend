@@ -12,7 +12,6 @@ import ProfileBtn from "./ProfileBtn";
 
 const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) => {
     const location = useLocation();
-    const navigate = useNavigate();
     
     const [navbarMode, setNavbarMode] = useState("home");
     const [openAddModal, setOpenAddModal] = useState(false);
@@ -101,12 +100,13 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
                                         Tiktok Stats
                                     </Typography>
                                 </>
-                            ) :  (
-                                <Button color="inherit" href="#">
-                                    <FastRewindIcon sx={{ paddingRight: "5px" }} />
-                                    RETURN TO HOME
-                                </Button>
-                            )
+                            ) :  
+                                <>
+                                    <Button color="inherit" href="#">
+                                        <FastRewindIcon sx={{ paddingRight: "5px" }} />
+                                        RETURN TO HOME
+                                    </Button>
+                                </>
                             }
                         </Box>
                        
