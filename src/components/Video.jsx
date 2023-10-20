@@ -1,5 +1,5 @@
 import { React, useState } from 'react'
-import { Box, IconButton, TextField, Typography, Switch, Fab, FormControlLabel } from '@mui/material';
+import { Box, IconButton, TextField, Typography, Divider } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,10 +10,11 @@ import { Autosave, useAutosave } from 'react-autosave';
 import { APIFetch, renderImprovements } from "../Helper.jsx"
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteTiktokForm from "./DeleteTiktokForm";
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 const tiktok_stats_style = {
   height:"375px", 
-  backgroundColor: "#f5ebed", 
+  backgroundColor: "#FADADD",
   border: "1px solid #f2e6e8",
   display: "flex",
   flexDirection: "column",
@@ -22,7 +23,7 @@ const tiktok_stats_style = {
   width: "200px"
 }
 
-function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes, handleSnackbar, editMode} ) {
+function Video( {tiktoks, getTiktoks, handleSnackbar, editMode, title} ) {
 
   const [notes, setNotes] = useState({})
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
@@ -56,19 +57,28 @@ function Video( {tiktoks, getTiktoks, setOpenWeeklyNotes, handleSnackbar, editMo
 
   return (
     <>
+    <Box component="h2" sx={{display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Montserrat", fontWeight: "normal", backgroundColor: "#FFD8BE", padding: "0.83em", margin: "0"}}>
+      <AssessmentIcon sx={{paddingRight: "0.3rem"}}/>
+      Weekly Report for {title}
+    </Box>
+    <Divider/>
     <TableContainer>
-      <Table aria-label="simple table">
+      <Table>
         <TableHead>
           <TableRow>
             <TableCell width="10%">
-              <Typography component="h2"><Box component="span" fontWeight="bold">Tiktok Thumbnail</Box></Typography>
+            <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
+              <Typography component="h1"><Box component="span" fontWeight="bold">Tiktok Thumbnail</Box></Typography>
+              </Box>
             </TableCell>
-            <TableCell width="13%">
-              <Typography component="h2"><Box component="span" fontWeight="bold">Tiktok Statistics</Box></Typography>
+            <TableCell width="10%">
+              <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
+              <Typography component="h1"><Box component="span" fontWeight="bold">Tiktok Statistics</Box></Typography>
+              </Box>
             </TableCell>
             <TableCell>
               <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
-                <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
+                <Typography component="h1"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
               </Box>
             </TableCell>
           </TableRow>

@@ -36,7 +36,7 @@ const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
 function WeeklyReport({handleSnackbar}) {
   const params = useParams();
   
-  const [weeklyReport, setWeeklyReport] = useState()
+  const [weeklyReport, setWeeklyReport] = useState({})
   const [tiktoks, setTiktoks] = useState([])
   const [openWeeklyNotes, setOpenWeeklyNotes] = useState(false)
   const [openAddTiktok, setOpenAddTiktok] = useState(false)
@@ -60,10 +60,6 @@ function WeeklyReport({handleSnackbar}) {
     { icon: <NotesIcon/>, name: 'Weekly Notes', onclick: handleOpenWeeklyNotes },
     { icon: <EditIcon/>, name: 'Edit', onclick: handleEditMode },
   ];
-
-  const handleWeeklyNotes = () => {
-    
-  }
 
   const updateWeeklyNotes = async () => {
     await APIFetch(`/api/weekly-reports/${params.id}`, "PUT", {"notes": weeklyNotes})
@@ -106,7 +102,7 @@ function WeeklyReport({handleSnackbar}) {
   return (
     <>
       <Navbar/>
-      <Video tiktoks={tiktoks} getTiktoks={getTiktoks} setOpenWeeklyNotes={setOpenWeeklyNotes} handleSnackbar={handleSnackbar} editMode={editMode}/>
+      <Video tiktoks={tiktoks} getTiktoks={getTiktoks} handleSnackbar={handleSnackbar} editMode={editMode} title={weeklyReport["title"] !== undefined ? weeklyReport["title"] : "Loading..."}/>
 
       <StyledSpeedDial
           ariaLabel="SpeedDial"
