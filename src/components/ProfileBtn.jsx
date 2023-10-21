@@ -50,7 +50,7 @@ function ProfileBtn() {
             >
             {/* <Avatar alt="Cheekyglo Logo" src={logo} sx={profilePicStyle}/> */}
             <Avatar sx={profilePicStyle}>
-              {currentUser.charAt(0)}
+              {currentUser === null ? "" : currentUser.charAt(0)}
             </Avatar>
               {currentUser}
             <ArrowDropDownIcon/>
