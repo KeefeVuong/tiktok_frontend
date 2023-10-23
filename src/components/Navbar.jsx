@@ -1,29 +1,31 @@
-import { React, useState, useEffect } from 'react';
-import { Box, Button, Typography, Toolbar, AppBar, Avatar } from '@mui/material';
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Typography, Toolbar, AppBar, Avatar, Menu, MenuItem, IconButton } from '@mui/material';
+import { useNavigate, useLocation } from "react-router-dom";
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import FastRewindIcon from '@mui/icons-material/FastRewind';
-import logo from "../assets/logo.jpg"
+import MenuIcon from '@mui/icons-material/Menu';
+import logo from "../assets/logo.jpg";
 import CustomModal from './CustomModal';
 import BulkRefreshBtn from './BulkRefreshBtn';
 import LogoutBtn from './LogoutBtn';
 import ProfileBtn from "./ProfileBtn";
 
-
-const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => {
-    const location = useLocation()
+const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) => {
+    const location = useLocation();
     
-    const [navbarMode, setNavbarMode] = useState("home")
-    const [openAddModal, setOpenAddModal] = useState(false)
+    const [navbarMode, setNavbarMode] = useState("home");
+    const [openAddModal, setOpenAddModal] = useState(false);
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+    const [isMobile, setIsMobile] = useState(false);
 
     const handleAddModal = () => {
-        setOpenAddModal(!openAddModal)
+        setOpenAddModal(!openAddModal);
     }
 
     const handleSuccessFetch = (message) => {
-        sessionStorage.clear()
-        getWeeklyReports()
-        handleSnackbar(true, message)
+        sessionStorage.clear();
+        getWeeklyReports();
+        handleSnackbar(true, message);
     }
 
     const handlePlaceholderWeeklyReport = (mode) => {
@@ -44,60 +46,110 @@ const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => 
         getWeeklyReports()
     }
 
+    const handleMenuOpen = (event) => {
+        setMenuAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setMenuAnchorEl(null);
+    };
+
     useEffect(() => {
         if (location.pathname === "/") {
-            setNavbarMode("home")
+            setNavbarMode("home");
+        } else {
+            setNavbarMode("weekly-report");
         }
-        else {
-            setNavbarMode("weekly-report")
-        }
-    }, [location.pathname])
+
+        // Check for mobile device based on screen width
+        const handleResize = () => {
+            if (window.innerWidth <= 795) {
+                setIsMobile(true);
+            } else {
+                setIsMobile(false);
+            }
+        };
+        
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, [location.pathname]);
 
     return (
         <>
-        <Box sx={{ flexGrow: 1 }}>
-            <AppBar position="fixed" sx={{backgroundColor: "#de8590"}}>
-                <Toolbar sx={{display: "flex", justifyContent: "space-between"}}>
-                    <Box>
-                        {navbarMode === "home" ?
-                        <Box sx={{display: "flex", alignItems: "center", gap: "10px"}}>
-                            <Avatar alt="Cheekyglo Logo" src={logo} component="a" href="https://www.tiktok.com/@cheekyglo" target="_blank"/>
-                            <Typography variant="h6" component="span">
-                                Tiktok Stats
-                            </Typography>
-
+            <Box sx={{ flexGrow: 1 }}>
+                <AppBar position="fixed" sx={{ backgroundColor: "#de8590" }}>
+                    <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+                        <Box sx={{ display: "flex", alignItems: "center", gap:"10px" }}>
+                            {navbarMode === "home" ? (
+                                <>
+                                    {isMobile ? (<IconButton
+                                        edge="start"
+                                        color="inherit"
+                                        aria-label="menu"
+                                        onClick={handleMenuOpen}
+                                    >
+                                        <MenuIcon />
+                                    </IconButton>) : null}
+                                    <Avatar alt="Cheekyglo Logo" src={logo} component="a" href="https://www.tiktok.com/@cheekyglo" target="_blank" />
+                                    <Typography variant="h6" component="span">
+                                        Tiktok Dashboard
+                                    </Typography>
+                                </>
+                            ) :  
+                                <>
+                                    <Button color="inherit" href="#">
+                                        <FastRewindIcon sx={{ paddingRight: "5px" }} />
+                                        RETURN TO HOME
+                                    </Button>
+                                </>
+                            }
                         </Box>
-        
-                        :
-                        <Button href="#" color="inherit">
-                            <FastRewindIcon sx={{paddingRight: "5px"}}/>
-                            RETURN TO HOME
-                        </Button>
-                        }
-                    </Box>
-                    <Box sx={{display: "flex", alignItems: "center", justifyContent: "flex-end"}}>
-                        {navbarMode === "home" ?
-                        <>
-                            <Button onClick={handleAddModal} color="inherit">
-                                <AssessmentIcon sx={{paddingRight: "5px"}}/>
+                       
+                        {isMobile ? null : (
+                            navbarMode === "home" ? (
+                                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
+                                    <Button onClick={handleAddModal} color="inherit">
+                                        <AssessmentIcon sx={{ paddingRight: "5px" }} />
+                                        ADD WEEKLY REPORT
+                                    </Button>
+                                    |
+                                    <BulkRefreshBtn selected={selected} handleSnackbar={handleSnackbar} handleSuccessFetch={handleSuccessFetch} />
+                                    |
+                                    <ProfileBtn />
+                                </Box>
+                            ) : null
+                        )}
+                    </Toolbar>
+                </AppBar>
+                <Toolbar />
+            </Box>
+
+            <Menu
+                anchorEl={menuAnchorEl}
+                open={Boolean(menuAnchorEl)}
+                onClose={handleMenuClose}
+            >
+                {navbarMode === "home" ? (
+                    <Box>
+                        <MenuItem onClick={handleAddModal}>
+                            <Button color="inherit">
+                                <AssessmentIcon sx={{ paddingRight: "5px" }} />
                                 ADD WEEKLY REPORT
                             </Button>
-                            |
+                        </MenuItem>
+                        <MenuItem>
                             <BulkRefreshBtn selected={selected} handleSnackbar={handleSnackbar} handleSuccessFetch={handleSuccessFetch}/>
-                            {/* |
-                            <LogoutBtn/> */}
-                            |
+                        </MenuItem>
+                        <MenuItem>
                             <ProfileBtn/>
-                        </>
-                        :
-                        <>
-                        </>
-                        }
+                        </MenuItem>
                     </Box>
-                </Toolbar>
-            </AppBar>
-            <Toolbar/>
-        </Box>
+                ) : null}
+            </Menu>
 
         <CustomModal 
         handleAddModal={handleAddModal} 
@@ -110,4 +162,5 @@ const NavBar = ({weeklyReports, getWeeklyReports, selected, handleSnackbar}) => 
         </>
     );
 }
+
 export default NavBar;

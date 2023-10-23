@@ -14,8 +14,8 @@ export const APIFetch = async (path, method, body) => {
   }
 
   try {
-    const response = await fetch(`https://keefe-tk-be.xyz${path}`, callContent);
-    // const response = await fetch(`http://127.0.0.1:8000${path}`, callContent);
+    // const response = await fetch(`https://keefe-tk-be.xyz${path}`, callContent);
+    const response = await fetch(`http://127.0.0.1:8000${path}`, callContent);
     const data = await response.json();
     if (response.ok) {
       return Promise.resolve(data);
@@ -58,7 +58,15 @@ export const renderImprovements = (stat, improvement_stat, last_updated, individ
   }
   else {
     return (
-      Intl.NumberFormat('en-US', {notation: "compact",maximumFractionDigits: 0}).format(stat)
+      factoriseNum(stat)
     )
   }
+}
+
+export const factoriseNum = (stat) => {
+  return Intl.NumberFormat('en-US', {notation: "compact",maximumFractionDigits: 0}).format(stat)
+}
+
+export const graphData = (weeklyReports, stat) => {
+  return weeklyReports.map(weeklyReport => weeklyReport[stat]).reverse()
 }

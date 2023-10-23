@@ -57,6 +57,11 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
     }
 
     const createWeeklyReport = async () => {
+        if (modalData["number_of_videos"] === "" || modalData["title"] === "" || modalData["tiktok_account"] === "") {
+            handleSnackbar(true, "ERROR: Ensure all fields are completed")
+            return
+        }
+
         handleAddModal()
   
         // temp work around to session storage, getweeklyreport sets if not empty.
@@ -92,6 +97,8 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
                     InputProps={{
                         startAdornment: <InputAdornment position="start">@</InputAdornment>,
                     }}
+                    fullWidth
+                    required
                     disabled
                     value={modalData["tiktok_account"]}
                     />
@@ -101,6 +108,7 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
                 label="Title"
                 name="title"
                 fullWidth
+                required
                 value={modalData["title"]}
                 onChange={changeModalDetails}
                 sx={{marginBottom: "20px"}}
@@ -111,6 +119,7 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
                 label="Number of Videos"
                 value={modalData["number_of_videos"]}
                 onChange={changeModalDetails}
+                required
                 fullWidth
                 type="number"
                 sx={{marginBottom: "30px"}}
