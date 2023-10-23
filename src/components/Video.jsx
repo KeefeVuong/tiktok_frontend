@@ -57,15 +57,15 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode, title} ) {
 
   return (
     <>
-    <Box component="h2" sx={{display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Montserrat", fontWeight: "normal", backgroundColor: "#FFD8BE", padding: "0.83em", margin: "0"}}>
+    {/* <Box component="h2" sx={{display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Montserrat", fontWeight: "normal", backgroundColor: "#FFD8BE", padding: "0.83em", margin: "0"}}>
       <AssessmentIcon sx={{paddingRight: "0.3rem"}}/>
       Weekly Report for {title}
-    </Box>
+    </Box> */}
     <Divider/>
     <TableContainer>
       <Table>
         <TableHead>
-          <TableRow>
+          <TableRow sx={{backgroundColor: "#FFD8BE"}}>
             <TableCell width="10%">
             <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
               <Typography component="h1"><Box component="span" fontWeight="bold">Tiktok Thumbnail</Box></Typography>

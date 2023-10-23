@@ -5,17 +5,12 @@ import Navbar from "../components/Navbar"
 import { useParams } from 'react-router-dom';
 import { APIFetch } from "../Helper.jsx"
 import { Editor } from '@tinymce/tinymce-react';
-import AddIcon from '@mui/icons-material/Add';
-import AddTiktokForm from '../components/AddTiktokForm';
-
 import { styled } from '@mui/material/styles';
+import AddTiktokForm from '../components/AddTiktokForm';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
-import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
 import EditIcon from '@mui/icons-material/Edit';
-import PrintIcon from '@mui/icons-material/Print';
-import ShareIcon from '@mui/icons-material/Share';
 import NotesIcon from '@mui/icons-material/Notes';
 
 import { Autosave, useAutosave } from 'react-autosave';
@@ -96,7 +91,6 @@ function WeeklyReport({handleSnackbar}) {
 
   useEffect(() => {
     getTiktoks()
-
   }, [])
 
   return (

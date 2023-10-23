@@ -1,11 +1,33 @@
 import { React, useState, useEffect } from 'react'
-import { Box, Typography, Skeleton, Link} from '@mui/material';
+import { Box, Typography, Skeleton, Link, Divider, IconButton } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { renderImprovements } from "../Helper.jsx"
 import Navbar from "../components/Navbar"
 import useWeeklyReports from '../hooks/useWeeklyReports.jsx';
 import LoadingBackdrop from '../components/LoadingBackdrop.jsx';
 import DeleteWeeklyReportBtn from '../components/DeleteWeeklyReportBtn.jsx';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const columns = [
     { 
@@ -104,6 +126,37 @@ function Home({handleSnackbar}) {
     .then(() => setLoading(false))
   }, [])
 
+  const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: 'Dataset 1',
+        data: [1, 2, 3],
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      },
+      {
+        label: 'Dataset 2',
+        data: [100, 200, 300],
+        borderColor: 'rgb(53, 162, 235)',
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      },
+    ],
+  };
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Chart.js Line Chart',
+      },
+    },
+  };
+
   return (
     <>
     <Navbar
@@ -112,9 +165,24 @@ function Home({handleSnackbar}) {
     getWeeklyReports={getWeeklyReports}
     handleSnackbar={handleSnackbar}
     />
-    <Box sx={{height: "calc(100vh - 65px)"}}>
+    {/* <IconButton size="small" sx={{position: "absolute", left: "-1.25rem", width: "10px"}}>  */}
+    <IconButton color="inherit" sx={{marginTop: "1rem", zIndex: "100", position: "absolute", right: "-0.65rem", backgroundColor: "#de8590", borderRadius: "15px", "&:hover": {backgroundColor: "#de8590"}}}>
+      <DoubleArrowIcon sx={{marginRight: "0.5rem", transform: "rotate(180deg)", color: "white"}}/>
+    </IconButton>
+    <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "calc(100vh - 65px)"}}>
+        {/* <Box sx={{display: "flex", justifyContent: "space-around", height: "40%", width: "100%"}}>
+          <Line
+          data={data}
+          options={options}
+          />
+          <Line
+          data={data}
+          options={options}
+          />
+        </Box>
+        <Divider sx={{marginTop: "1rem"}} flexItem={true}/> */}
         <DataGrid
-        sx={{border: 0}}
+        sx={{border: "0", height: "60%", width: "100%"}}
         rows={weeklyReports}
         columns={columns}
         checkboxSelection 
@@ -126,9 +194,9 @@ function Home({handleSnackbar}) {
         localeText={{ noRowsLabel: loading ? "" : "No Weekly Reports Exist" }}
         autoPageSize
         // initialState={{
-        //     pagination: { paginationModel: { pageSize: 10 } },
-        //     sorting: {
-        //       sortModel: [{ field: 'date', sort: 'desc' }],
+          //     pagination: { paginationModel: { pageSize: 10 } },
+          //     sorting: {
+            //       sortModel: [{ field: 'date', sort: 'desc' }],
         //     },
         // }}
         // pageSizeOptions={[10, 20, 25]}
