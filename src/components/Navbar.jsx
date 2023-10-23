@@ -83,7 +83,6 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="fixed" sx={{ backgroundColor: "#de8590" }}>
                     <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          
                         <Box sx={{ display: "flex", alignItems: "center", gap:"10px" }}>
                             {navbarMode === "home" ? (
                                 <>
@@ -97,7 +96,7 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
                                     </IconButton>) : null}
                                     <Avatar alt="Cheekyglo Logo" src={logo} component="a" href="https://www.tiktok.com/@cheekyglo" target="_blank" />
                                     <Typography variant="h6" component="span">
-                                        Tiktok Stats
+                                        Tiktok Dashboard
                                     </Typography>
                                 </>
                             ) :  

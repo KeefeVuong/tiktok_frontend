@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from 'react'
-import { Box, Typography, Skeleton, Link, Divider, IconButton } from '@mui/material';
+import { Box, Typography, Skeleton, Link, Drawer, IconButton, Container, Slider } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { renderImprovements } from "../Helper.jsx"
+import { factoriseNum, graphData, renderImprovements } from "../Helper.jsx"
 import Navbar from "../components/Navbar"
 import useWeeklyReports from '../hooks/useWeeklyReports.jsx';
 import LoadingBackdrop from '../components/LoadingBackdrop.jsx';
@@ -15,9 +15,12 @@ import {
   Title,
   Tooltip,
   Legend,
+  LogarithmicScale,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import GraphScale from '../components/GraphScale.jsx';
 
 ChartJS.register(
   CategoryScale,
@@ -26,7 +29,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  LogarithmicScale
 );
 
 const columns = [
@@ -119,32 +123,66 @@ function Home({handleSnackbar}) {
   const [weeklyReports, setWeeklyReports] = useState([])
   const [selected, setSelected] = useState([])
   const [loading, setLoading] = useState(true)
+  const [openGraphs, setOpenGraphs] = useState(false)
   const {getWeeklyReports, deleteWeeklyReports} = useWeeklyReports({handleSnackbar, selected, setSelected, setWeeklyReports})
+  const [graphYScale, setGraphYScale] = useState([0, 1000000])
+  const [graphXScale, setGraphXScale] = useState([])
+  const [adjustYAxis, setAdjustYAxis] = useState(false)
+
+  const handleOpenGraphs = () => {
+    setOpenGraphs(!openGraphs)
+  }
+
+  const handleGraphYScale = (event, newValue) => {
+    setGraphYScale(newValue);
+  };
+
+  const handleGraphXScale = (newValue) => {
+    setGraphXScale(...[newValue]);
+  };
 
   useEffect(() => {
     getWeeklyReports()
-    .then(() => setLoading(false))
+    .then(() => {
+      setLoading(false)
+    })
   }, [])
+  
+  useEffect(() => {
+    handleGraphXScale(graphData(weeklyReports, "title"))
+  }, [weeklyReports])
 
-  const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-  const data = {
-    labels,
+  const totalEngagementData = {
+    labels: graphXScale,
     datasets: [
       {
-        label: 'Dataset 1',
-        data: [1, 2, 3],
+        label: 'Total Views',
+        data: graphData(weeklyReports, "total_views"),
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
       },
       {
-        label: 'Dataset 2',
-        data: [100, 200, 300],
+        label: 'Total Likes',
+        data: graphData(weeklyReports, "total_likes"),
         borderColor: 'rgb(53, 162, 235)',
         backgroundColor: 'rgba(53, 162, 235, 0.5)',
       },
+      {
+        label: 'Total Comments',
+        data: graphData(weeklyReports, "total_comments"),
+        borderColor: "#6C63B1",
+        backgroundColor: "#8884d8",
+      },
+      {
+        label: 'Total Favourites',
+        data: graphData(weeklyReports, "total_favourites"),
+        borderColor: "#5DAD7B",
+        backgroundColor: "#82ca9d",
+      },
     ],
   };
-  const options = {
+
+  const totalEngagementOptions = {
     responsive: true,
     plugins: {
       legend: {
@@ -152,10 +190,34 @@ function Home({handleSnackbar}) {
       },
       title: {
         display: true,
-        text: 'Chart.js Line Chart',
+        text: 'Total Engagement',
       },
     },
+    scales: {
+      y: { 
+        min: adjustYAxis ? graphYScale[0] : null,
+        max: adjustYAxis ? graphYScale[1] : null,
+        title: {
+          display: true,
+          text: "Engagement"
+        },
+        ticks: {
+          callback: function (value) {
+            return (
+              factoriseNum(value)
+            )
+          },
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Weekly Reports"
+        }
+      }
+    },
   };
+
 
   return (
     <>
@@ -165,22 +227,11 @@ function Home({handleSnackbar}) {
     getWeeklyReports={getWeeklyReports}
     handleSnackbar={handleSnackbar}
     />
-    {/* <IconButton size="small" sx={{position: "absolute", left: "-1.25rem", width: "10px"}}>  */}
-    <IconButton color="inherit" sx={{marginTop: "1rem", zIndex: "100", position: "absolute", right: "-0.65rem", backgroundColor: "#de8590", borderRadius: "15px", "&:hover": {backgroundColor: "#de8590"}}}>
+    <IconButton onClick={handleOpenGraphs} color="inherit" sx={{marginTop: "2rem", zIndex: "100", position: "fixed", right: "-0.65rem", backgroundColor: "#de8590", borderRadius: "15px", "&:hover": {backgroundColor: "#de8590"}}}>
       <DoubleArrowIcon sx={{marginRight: "0.5rem", transform: "rotate(180deg)", color: "white"}}/>
     </IconButton>
+
     <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "calc(100vh - 65px)"}}>
-        {/* <Box sx={{display: "flex", justifyContent: "space-around", height: "40%", width: "100%"}}>
-          <Line
-          data={data}
-          options={options}
-          />
-          <Line
-          data={data}
-          options={options}
-          />
-        </Box>
-        <Divider sx={{marginTop: "1rem"}} flexItem={true}/> */}
         <DataGrid
         sx={{border: "0", height: "60%", width: "100%"}}
         rows={weeklyReports}
@@ -203,8 +254,40 @@ function Home({handleSnackbar}) {
         />
     </Box>
 
+    <Drawer
+      open={openGraphs}
+      onClose={handleOpenGraphs}
+      anchor="right"
+    >
+        <IconButton onClick={handleOpenGraphs} color="inherit" sx={{marginTop: "calc(2rem + 60px)", zIndex: "100", position: "absolute", left: "-0.65rem", backgroundColor: "#de8590", borderRadius: "15px", "&:hover": {backgroundColor: "#de8590"}}}>
+          <DoubleArrowIcon sx={{marginLeft: "0.5rem", color: "white"}}/>
+        </IconButton>
+        <Box color="white" sx={{position: "absolute", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#de8590", height: "65px", width: "100%"}}>
+          <TimelineIcon sx={{marginRight: "0.25rem"}}/>
+          <Typography fontWeight="bold">
+              Tiktok Analytics
+          </Typography>
+        </Box>
+        <Container sx={{display: "flex", flexDirection: "column", justifyContent: "start", margin: "5.5rem 2rem 0rem 2rem", height: "100%", width: "100%"}} maxWidth="md">
+          <GraphScale 
+          graphYScale={graphYScale} 
+          handleGraphYScale={handleGraphYScale} 
+          maxVal={Math.max(...totalEngagementData.datasets[0].data)} 
+          graphXScale={graphXScale} 
+          handleGraphXScale={handleGraphXScale} 
+          weeklyReportTitles={graphData(weeklyReports, "title")}
+          adjustYAxis={adjustYAxis}
+          setAdjustYAxis={setAdjustYAxis}
+          />
+          <Line
+            data={totalEngagementData}
+            options={totalEngagementOptions}
+          />
+        </Container>  
+    </Drawer>
+
     <DeleteWeeklyReportBtn selected={selected} deleteWeeklyReports={deleteWeeklyReports}/>
-    <LoadingBackdrop loading={loading} message={"Loading Weekly Report"}/>
+    <LoadingBackdrop loading={loading} message={"Loading Weekly Report..."}/>
     </>
   )
 }

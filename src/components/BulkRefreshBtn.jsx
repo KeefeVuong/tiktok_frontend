@@ -49,7 +49,7 @@ function BulkRefreshBtn({ selected, handleSnackbar, handleSuccessFetch }) {
                 BULK REFRESH STATS
             </Button>
 
-            <LoadingBackdrop loading={loading} message={"Bulk Refreshing Tiktok Stats"}/>
+            <LoadingBackdrop loading={loading} message={"Bulk Refreshing Tiktok Stats..."}/>
         </>
     )
 }

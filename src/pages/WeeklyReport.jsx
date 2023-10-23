@@ -14,6 +14,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import NotesIcon from '@mui/icons-material/Notes';
 
 import { Autosave, useAutosave } from 'react-autosave';
+import LoadingBackdrop from '../components/LoadingBackdrop';
 
 
 const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
@@ -37,6 +38,7 @@ function WeeklyReport({handleSnackbar}) {
   const [openAddTiktok, setOpenAddTiktok] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [weeklyNotes, setWeeklyNotes] = useState("")
+  const [loading, setLoading] = useState(true)
 
   const handleEditMode = () => {
     setEditMode(!editMode)
@@ -83,6 +85,7 @@ function WeeklyReport({handleSnackbar}) {
       console.error(e.message)
       handleSnackbar(true, "ERROR: Get Tiktok Data")
     })
+    setLoading(false)
   }
 
   const editorRef = useRef(null);
@@ -156,7 +159,10 @@ function WeeklyReport({handleSnackbar}) {
       </Drawer>
 
         
-
+      <LoadingBackdrop
+      loading={loading}
+      message="Loading Tiktok Data..."
+      />
       <AddTiktokForm
       openAddTiktok={openAddTiktok}
       handleAddTiktok={handleAddTiktok}

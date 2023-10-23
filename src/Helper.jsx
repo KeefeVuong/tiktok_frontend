@@ -58,7 +58,15 @@ export const renderImprovements = (stat, improvement_stat, last_updated, individ
   }
   else {
     return (
-      Intl.NumberFormat('en-US', {notation: "compact",maximumFractionDigits: 0}).format(stat)
+      factoriseNum(stat)
     )
   }
+}
+
+export const factoriseNum = (stat) => {
+  return Intl.NumberFormat('en-US', {notation: "compact",maximumFractionDigits: 0}).format(stat)
+}
+
+export const graphData = (weeklyReports, stat) => {
+  return weeklyReports.map(weeklyReport => weeklyReport[stat]).reverse()
 }
