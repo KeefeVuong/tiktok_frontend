@@ -49,7 +49,7 @@ function GraphScale({graphYScale, handleGraphYScale, maxVal, graphXScale, handle
                 <Typography gutterBottom>
                     Adjust Y-Axis Scale
                     <Switch 
-                    checked={!adjustYAxis}
+                    checked={adjustYAxis}
                     onChange={handleAdjustYAxis}
                     sx={{
                         '& .MuiSwitch-switchBase.Mui-checked': {
