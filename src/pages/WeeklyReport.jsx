@@ -139,7 +139,7 @@ function WeeklyReport({handleSnackbar}) {
         <Editor
           id="5"
           onInit={(editor) => (editorRef.current = editor)}
-          initialValue={weeklyReport !== undefined ? weeklyReport["notes"] : ""}
+          value={weeklyReport !== undefined ? weeklyReport["notes"] : ""}
           onEditorChange={(val) => {setWeeklyNotes(val)}}
           init={{
             selector: 'textarea',
