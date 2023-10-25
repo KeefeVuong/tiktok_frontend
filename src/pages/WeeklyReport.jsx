@@ -67,7 +67,7 @@ function WeeklyReport({handleSnackbar}) {
   
     if (weeklyNotes.length !== 0) {
       handleSnackbar(true, "SUCCESS: Saved Weekly Notes")
-      weeklyReport["notes"] = weeklyNotes
+      weeklyReport.current["notes"] = weeklyNotes
     }
 
   }
@@ -76,7 +76,7 @@ function WeeklyReport({handleSnackbar}) {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
     .then((data) => {
       setTiktoks(data["tiktok"].reverse())
-      weeklyReport = data["weekly_report"]
+      weeklyReport.current = data["weekly_report"]
     })
     .catch((e) => {
       console.error(e.message)
@@ -136,7 +136,7 @@ function WeeklyReport({handleSnackbar}) {
         <Editor
           id="5"
           onInit={(editor) => (editorRef.current = editor)}
-          initialValue={weeklyReport !== undefined ? weeklyReport["notes"] : ""}
+          initialValue={weeklyReport.current !== undefined ? weeklyReport.current["notes"] : ""}
           value={weeklyNotes}
           onEditorChange={(val) => {setWeeklyNotes(val)}}
           init={{
