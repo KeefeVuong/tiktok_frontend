@@ -32,7 +32,7 @@ const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
 function WeeklyReport({handleSnackbar}) {
   const params = useParams();
   
-  const [weeklyReport, setWeeklyReport] = useState({})
+  const weeklyReport = useRef([])
   const [tiktoks, setTiktoks] = useState([])
   const [openWeeklyNotes, setOpenWeeklyNotes] = useState(false)
   const [openAddTiktok, setOpenAddTiktok] = useState(false)
@@ -67,9 +67,7 @@ function WeeklyReport({handleSnackbar}) {
   
     if (weeklyNotes.length !== 0) {
       handleSnackbar(true, "SUCCESS: Saved Weekly Notes")
-      let newWeeklyReport = {...weeklyReport}
-      newWeeklyReport["notes"] = weeklyNotes
-      setWeeklyReport(newWeeklyReport)
+      weeklyReport["notes"] = weeklyNotes
     }
 
   }
@@ -78,7 +76,7 @@ function WeeklyReport({handleSnackbar}) {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
     .then((data) => {
       setTiktoks(data["tiktok"].reverse())
-      setWeeklyReport(data["weekly_report"])
+      weeklyReport = data["weekly_report"]
     })
     .catch((e) => {
       console.error(e.message)
