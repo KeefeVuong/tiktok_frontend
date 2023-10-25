@@ -78,6 +78,7 @@ function WeeklyReport({handleSnackbar}) {
       setTiktoks(data["tiktok"].reverse())
       if (editorRef.current) {
         editorRef.current.setContent(data["weekly_report"]["notes"])
+        alert(editorRef.current.getContent())
       }
     })
     .catch((e) => {
@@ -88,7 +89,7 @@ function WeeklyReport({handleSnackbar}) {
   }
 
  
-  useAutosave({ data: editorRef.current ? editorRef.current.getContent() : null, onSave: updateWeeklyNotes, interval: 1000 });
+  useAutosave({ data: editorRef.current.getContent() , onSave: updateWeeklyNotes, interval: 1000 });
 
   useEffect(() => {
     getTiktoks()
