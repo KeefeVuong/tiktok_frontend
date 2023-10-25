@@ -88,7 +88,7 @@ function WeeklyReport({handleSnackbar}) {
   }
 
  
-  useAutosave({ data: weeklyNotes, onSave: updateWeeklyNotes, interval: 1000 });
+  useAutosave({ data: editorRef.current ? editorRef.current.content : null, onSave: updateWeeklyNotes, interval: 1000 });
 
   useEffect(() => {
     getTiktoks()
