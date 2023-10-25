@@ -32,6 +32,7 @@ const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
 function WeeklyReport({handleSnackbar}) {
   const params = useParams();
   
+  const editorRef = useRef(null);
   const [weeklyReport, setWeeklyReport] = useState({})
   const [tiktoks, setTiktoks] = useState([])
   const [openWeeklyNotes, setOpenWeeklyNotes] = useState(false)
@@ -59,19 +60,15 @@ function WeeklyReport({handleSnackbar}) {
   ];
 
   const updateWeeklyNotes = async () => {
-    await APIFetch(`/api/weekly-reports/${params.id}`, "PUT", {"notes": weeklyNotes})
+    await APIFetch(`/api/weekly-reports/${params.id}`, "PUT", {"notes": editorRef.current.getContent()})
+    .then(() => {
+      handleSnackbar(true, "SUCCESS: Saved Weekly Notes")
+
+    })
     .catch((e) => {
       console.error(e.message)
       handleSnackbar(true, "ERROR: Saved Weekly Notes")
     })
-  
-    if (weeklyNotes.length !== 0) {
-      handleSnackbar(true, "SUCCESS: Saved Weekly Notes")
-      let newWeeklyReport = {...weeklyReport}
-      newWeeklyReport["notes"] = weeklyNotes
-      setWeeklyReport(newWeeklyReport)
-      setWeeklyNotes("")
-    }
 
   }
 
@@ -79,7 +76,9 @@ function WeeklyReport({handleSnackbar}) {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
     .then((data) => {
       setTiktoks(data["tiktok"].reverse())
-      setWeeklyReport(data["weekly_report"])
+      if (editorRef.current) {
+        editorRef.current.setContent(data["weekly_report"]["notes"])
+      }
     })
     .catch((e) => {
       console.error(e.message)
@@ -88,7 +87,6 @@ function WeeklyReport({handleSnackbar}) {
     setLoading(false)
   }
 
-  const editorRef = useRef(null);
  
   useAutosave({ data: weeklyNotes, onSave: updateWeeklyNotes, interval: 1000 });
 
@@ -139,8 +137,8 @@ function WeeklyReport({handleSnackbar}) {
         <Editor
           id="5"
           onInit={(editor) => (editorRef.current = editor)}
-          value={weeklyReport !== undefined ? weeklyReport["notes"] : ""}
-          onEditorChange={(val) => {setWeeklyNotes(val)}}
+          // value={weeklyReport !== undefined ? weeklyReport["notes"] : ""}
+          // onEditorChange={(val) => {setWeeklyNotes(val)}}
           init={{
             selector: 'textarea',
             height: "100%",
