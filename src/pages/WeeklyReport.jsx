@@ -32,12 +32,12 @@ const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
 function WeeklyReport({handleSnackbar}) {
   const params = useParams();
   
-  const weeklyReport = useRef([])
+  // const weeklyReport = useRef([])
   const [tiktoks, setTiktoks] = useState([])
   const [openWeeklyNotes, setOpenWeeklyNotes] = useState(false)
   const [openAddTiktok, setOpenAddTiktok] = useState(false)
   const [editMode, setEditMode] = useState(false)
-  const [weeklyNotes, setWeeklyNotes] = useState("")
+  const weeklyNotes = useRef("")
   const [loading, setLoading] = useState(true)
 
   const handleEditMode = () => {
@@ -67,7 +67,6 @@ function WeeklyReport({handleSnackbar}) {
   
     if (weeklyNotes.length !== 0) {
       handleSnackbar(true, "SUCCESS: Saved Weekly Notes")
-      weeklyReport.current["notes"] = weeklyNotes
     }
 
   }
@@ -76,7 +75,7 @@ function WeeklyReport({handleSnackbar}) {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
     .then((data) => {
       setTiktoks(data["tiktok"].reverse())
-      weeklyReport.current = data["weekly_report"]
+      weeklyNotes.current = data["weekly_report"]["notes"]
     })
     .catch((e) => {
       console.error(e.message)
@@ -136,9 +135,9 @@ function WeeklyReport({handleSnackbar}) {
         <Editor
           id="5"
           onInit={(editor) => (editorRef.current = editor)}
-          initialValue={weeklyReport.current !== undefined ? weeklyReport.current["notes"] : ""}
-          value={weeklyNotes}
-          onEditorChange={(val) => {setWeeklyNotes(val)}}
+          // initialValue={weeklyNotes.current}
+          value={weeklyNotes.current}
+          onEditorChange={(val) => {weeklyNotes.current = val}}
           init={{
             selector: 'textarea',
             height: "100%",
