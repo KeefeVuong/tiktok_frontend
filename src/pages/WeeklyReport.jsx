@@ -76,10 +76,6 @@ function WeeklyReport({handleSnackbar}) {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
     .then((data) => {
       setTiktoks(data["tiktok"].reverse())
-      if (editorRef.current) {
-        editorRef.current.setContent(data["weekly_report"]["notes"])
-        alert(editorRef.current.getContent())
-      }
     })
     .catch((e) => {
       console.error(e.message)
@@ -89,7 +85,7 @@ function WeeklyReport({handleSnackbar}) {
   }
 
  
-  // useAutosave({ data: editorRef.current.getContent() , onSave: updateWeeklyNotes, interval: 1000 });
+  useAutosave({ data: editorRef.current , onSave: updateWeeklyNotes, interval: 1000 });
 
   useEffect(() => {
     getTiktoks()
@@ -139,7 +135,7 @@ function WeeklyReport({handleSnackbar}) {
           id="5"
           onInit={(editor) => (editorRef.current = editor)}
           // value={weeklyReport !== undefined ? weeklyReport["notes"] : ""}
-          // onEditorChange={(val) => {setWeeklyNotes(val)}}
+          onEditorChange={(val, editor) => {editorRef.current = editor}}
           init={{
             selector: 'textarea',
             height: "100%",
