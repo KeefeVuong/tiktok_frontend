@@ -89,7 +89,7 @@ function WeeklyReport({handleSnackbar}) {
   }
 
  
-  useAutosave({ data: editorRef.current.getContent() , onSave: updateWeeklyNotes, interval: 1000 });
+  // useAutosave({ data: editorRef.current.getContent() , onSave: updateWeeklyNotes, interval: 1000 });
 
   useEffect(() => {
     getTiktoks()
