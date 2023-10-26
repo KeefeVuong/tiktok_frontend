@@ -33,6 +33,7 @@ function WeeklyReport({handleSnackbar}) {
   const params = useParams();
   
   const editorRef = useRef(null);
+  // const weeklyNotes = useRef("");
   const [weeklyReport, setWeeklyReport] = useState({})
   const [tiktoks, setTiktoks] = useState([])
   const [openWeeklyNotes, setOpenWeeklyNotes] = useState(false)
@@ -60,7 +61,7 @@ function WeeklyReport({handleSnackbar}) {
   ];
 
   const updateWeeklyNotes = async () => {
-    await APIFetch(`/api/weekly-reports/${params.id}`, "PUT", {"notes": editorRef.current.getContent()})
+    await APIFetch(`/api/weekly-reports/${params.id}`, "PUT", {"notes": weeklyNotes})
     .then(() => {
       handleSnackbar(true, "SUCCESS: Saved Weekly Notes")
 
@@ -76,6 +77,7 @@ function WeeklyReport({handleSnackbar}) {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
     .then((data) => {
       setTiktoks(data["tiktok"].reverse())
+      setWeeklyNotes(data["weekly_report"]["notes"])
     })
     .catch((e) => {
       console.error(e.message)
@@ -84,8 +86,42 @@ function WeeklyReport({handleSnackbar}) {
     setLoading(false)
   }
 
- 
-  useAutosave({ data: editorRef.current , onSave: updateWeeklyNotes, interval: 1000 });
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault(); // Prevent the browser's default save action
+        updateWeeklyNotes(); // Call your custom save function
+      }
+    };
+
+    const editor = tinymce.get('5'); // Get the TinyMCE editor instance
+
+    const handleEditorBlur = () => {
+      
+      // Provide a custom message along with the generic confirmation message
+      const confirmationMessage = 'You have unsaved changes.';
+
+      // Display the confirmation message when the user leaves the page or unfocuses the editor
+      window.addEventListener('beforeunload', (e) => {
+        e.returnValue = confirmationMessage;
+      });
+      
+    };
+
+    if (editor) {
+      editor.on('keydown', handleKeyDown); // Add the keydown event listener to the editor
+      editor.on('blur', handleEditorBlur);
+    }
+
+
+    return () => {
+      if (editor) {
+        editor.off('keydown', handleKeyDown); 
+        editor.off('blur', handleEditorBlur);
+      }
+    };
+  }, [updateWeeklyNotes]);
+
 
   useEffect(() => {
     getTiktoks()
@@ -134,8 +170,8 @@ function WeeklyReport({handleSnackbar}) {
         <Editor
           id="5"
           onInit={(editor) => (editorRef.current = editor)}
-          // value={weeklyReport !== undefined ? weeklyReport["notes"] : ""}
-          onEditorChange={(val, editor) => {editorRef.current = editor}}
+          value={weeklyNotes}
+          onEditorChange={(val) => {setWeeklyNotes(val)}}
           init={{
             selector: 'textarea',
             height: "100%",
