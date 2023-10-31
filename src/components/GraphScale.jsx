@@ -8,6 +8,16 @@ function GraphScale({graphYScale, handleGraphYScale, maxVal, graphXScale, handle
 
     const handleAdjustYAxis = () => {
         setAdjustYAxis(!adjustYAxis)
+        let lowerLimit = 0
+        let upperLimit = maxVal
+        if (graphYScale[0] > 0 && graphYScale[0] < maxVal) {
+            lowerLimit = graphYScale[0]
+        }
+        if (graphYScale[1] > 0 && graphYScale[1] < maxVal) {
+            upperLimit = graphYScale[1]
+        }
+
+        handleGraphYScale(null, [lowerLimit, upperLimit])
     }
 
     const modifyXAxis = (e, val) => {

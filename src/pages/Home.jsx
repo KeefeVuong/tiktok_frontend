@@ -125,7 +125,7 @@ function Home({handleSnackbar}) {
   const [loading, setLoading] = useState(true)
   const [openGraphs, setOpenGraphs] = useState(false)
   const {getWeeklyReports, deleteWeeklyReports} = useWeeklyReports({handleSnackbar, selected, setSelected, setWeeklyReports})
-  const [graphYScale, setGraphYScale] = useState([0, 1000000])
+  const [graphYScale, setGraphYScale] = useState([0, 0])
   const [graphXScale, setGraphXScale] = useState([])
   const [adjustYAxis, setAdjustYAxis] = useState(false)
 
@@ -157,25 +157,25 @@ function Home({handleSnackbar}) {
     datasets: [
       {
         label: 'Total Views',
-        data: graphData(weeklyReports, "total_views"),
+        data: graphData(weeklyReports,"total_views", graphXScale),
         borderColor: 'rgb(255, 99, 132)',
         backgroundColor: 'rgba(255, 99, 132, 0.5)',
       },
       {
         label: 'Total Likes',
-        data: graphData(weeklyReports, "total_likes"),
+        data: graphData(weeklyReports, "total_likes", graphXScale),
         borderColor: 'rgb(53, 162, 235)',
         backgroundColor: 'rgba(53, 162, 235, 0.5)',
       },
       {
         label: 'Total Comments',
-        data: graphData(weeklyReports, "total_comments"),
+        data: graphData(weeklyReports, "total_comments", graphXScale),
         borderColor: "#6C63B1",
         backgroundColor: "#8884d8",
       },
       {
         label: 'Total Favourites',
-        data: graphData(weeklyReports, "total_favourites"),
+        data: graphData(weeklyReports, "total_favourites", graphXScale),
         borderColor: "#5DAD7B",
         backgroundColor: "#82ca9d",
       },
@@ -268,7 +268,7 @@ function Home({handleSnackbar}) {
               Tiktok Analytics
           </Typography>
         </Box>
-        <Container sx={{display: "flex", flexDirection: "column", justifyContent: "start", margin: "5.5rem 2rem 0rem 2rem", height: "100%", width: "100%"}} maxWidth="md">
+        <Container sx={{display: "flex", flexDirection: "column", justifyContent: "start", margin: "5.5rem 2rem 0rem 2rem", height: "100%"}} maxWidth="md">
           <GraphScale 
           graphYScale={graphYScale} 
           handleGraphYScale={handleGraphYScale} 
