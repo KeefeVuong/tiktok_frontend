@@ -67,6 +67,6 @@ export const factoriseNum = (stat) => {
   return Intl.NumberFormat('en-US', {notation: "compact",maximumFractionDigits: 0}).format(stat)
 }
 
-export const graphData = (weeklyReports, stat) => {
-  return weeklyReports.map(weeklyReport => weeklyReport[stat]).reverse()
+export const graphData = (weeklyReports, stat, graphXScale=undefined) => {
+  return !graphXScale ? weeklyReports.map(weeklyReport => weeklyReport[stat]).reverse() : weeklyReports.filter(weeklyReport => graphXScale.includes(weeklyReport["title"])).map(weeklyReport => weeklyReport[stat]).reverse()
 }
