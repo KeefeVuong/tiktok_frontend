@@ -1,5 +1,5 @@
 import { React, useState } from 'react'
-import { Box, IconButton, TextField, Typography, Divider } from '@mui/material';
+import { Box, IconButton, TextField, Typography, Divider, Button } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -52,7 +52,7 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode, title} ) {
     }
 
   }
-
+  
   useAutosave({ data: notes, onSave: updateNotes, interval: 1000 });
 
   return (
@@ -148,9 +148,14 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode, title} ) {
               <TableCell sx={{position: 'absolute', right: 0, borderBottom: 0}}>
                 {
                   editMode &&
-                  <IconButton onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}} sx={{position: 'absolute', right: 0.01, color: "#de8590"}}>
-                    <DeleteIcon/>
-                  </IconButton>
+                  <>
+                    <IconButton onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}} sx={{position: 'absolute', right: 0.01, color: "#de8590"}}>
+                      <DeleteIcon/>
+                    </IconButton>
+                    <Button onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order - 1}); getTiktoks()}}>Up</Button>
+                    <Button onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order + 1}); getTiktoks()}}>Down</Button>
+                  
+                  </>
                 }
               </TableCell>
             </TableRow>
