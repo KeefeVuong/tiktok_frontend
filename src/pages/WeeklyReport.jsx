@@ -12,9 +12,8 @@ import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
 import EditIcon from '@mui/icons-material/Edit';
 import NotesIcon from '@mui/icons-material/Notes';
-
-import { Autosave, useAutosave } from 'react-autosave';
 import LoadingBackdrop from '../components/LoadingBackdrop';
+import WeeklyNotes from '../components/WeeklyNotes';
 
 
 const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
@@ -31,14 +30,12 @@ const StyledSpeedDial = styled(SpeedDial)(({ theme }) => ({
 
 function WeeklyReport({handleSnackbar}) {
   const params = useParams();
-  
-  const editorRef = useRef(null);
+
   const [weeklyReport, setWeeklyReport] = useState({})
   const [tiktoks, setTiktoks] = useState([])
   const [openWeeklyNotes, setOpenWeeklyNotes] = useState(false)
   const [openAddTiktok, setOpenAddTiktok] = useState(false)
   const [editMode, setEditMode] = useState(false)
-  const [weeklyNotes, setWeeklyNotes] = useState("")
   const [loading, setLoading] = useState(true)
 
   const handleEditMode = () => {
@@ -59,23 +56,12 @@ function WeeklyReport({handleSnackbar}) {
     { icon: <EditIcon/>, name: 'Edit', onclick: handleEditMode },
   ];
 
-  const updateWeeklyNotes = async () => {
-    await APIFetch(`/api/weekly-reports/${params.id}`, "PUT", {"notes": editorRef.current.getContent()})
-    .then(() => {
-      handleSnackbar(true, "SUCCESS: Saved Weekly Notes")
-
-    })
-    .catch((e) => {
-      console.error(e.message)
-      handleSnackbar(true, "ERROR: Saved Weekly Notes")
-    })
-
-  }
 
   const getTiktoks = async () => {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
     .then((data) => {
-      setTiktoks(data["tiktok"].reverse())
+      setTiktoks(data["tiktok"])
+      setWeeklyReport(data["weekly_report"])
     })
     .catch((e) => {
       console.error(e.message)
@@ -84,8 +70,6 @@ function WeeklyReport({handleSnackbar}) {
     setLoading(false)
   }
 
- 
-  useAutosave({ data: editorRef.current , onSave: updateWeeklyNotes, interval: 1000 });
 
   useEffect(() => {
     getTiktoks()
@@ -94,7 +78,7 @@ function WeeklyReport({handleSnackbar}) {
   return (
     <>
       <Navbar/>
-      <Video tiktoks={tiktoks} getTiktoks={getTiktoks} handleSnackbar={handleSnackbar} editMode={editMode} title={weeklyReport["title"] !== undefined ? weeklyReport["title"] : "Loading..."}/>
+      <Video tiktoks={tiktoks} getTiktoks={getTiktoks} handleSnackbar={handleSnackbar} editMode={editMode}/>
 
       <StyledSpeedDial
           ariaLabel="SpeedDial"
@@ -126,32 +110,13 @@ function WeeklyReport({handleSnackbar}) {
           ))}
       </StyledSpeedDial>
 
-      <Drawer
-      sx={{width: "30%"}}
-      open={openWeeklyNotes}
-      onClose={handleOpenWeeklyNotes}
-      >
-        <Editor
-          id="5"
-          onInit={(editor) => (editorRef.current = editor)}
-          // value={weeklyReport !== undefined ? weeklyReport["notes"] : ""}
-          onEditorChange={(val, editor) => {editorRef.current = editor}}
-          init={{
-            selector: 'textarea',
-            height: "100%",
-            width: "100%",
-            menubar: true,
-            plugins: [
-              'table',
-            ],
-            toolbar: 'undo redo | formatselect | blocks fontfamily fontsize |' +
-            'bold italic backcolor | alignleft aligncenter ' +
-            'alignright alignjustify | bullist numlist outdent indent | ' +
-            'removeformat | restoredraft | help | table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
-            content_style: 'body { font-family:Monsterrat; font-size:24pt }'
-          }}
-        />
-      </Drawer>
+      <WeeklyNotes
+      openWeeklyNotes={openWeeklyNotes}
+      handleOpenWeeklyNotes={handleOpenWeeklyNotes}
+      weeklyReport={weeklyReport}
+      setWeeklyReport={setWeeklyReport}
+      handleSnackbar={handleSnackbar}
+      />
 
         
       <LoadingBackdrop

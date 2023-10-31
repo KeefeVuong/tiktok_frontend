@@ -1,5 +1,5 @@
 import { React, useState } from 'react'
-import { Box, IconButton, TextField, Typography, Divider } from '@mui/material';
+import { Box, IconButton, TextField, Typography, Divider, Button } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,7 +10,8 @@ import { Autosave, useAutosave } from 'react-autosave';
 import { APIFetch, renderImprovements } from "../Helper.jsx"
 import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteTiktokForm from "./DeleteTiktokForm";
-import AssessmentIcon from '@mui/icons-material/Assessment';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 const tiktok_stats_style = {
   height:"375px", 
@@ -23,7 +24,7 @@ const tiktok_stats_style = {
   width: "200px"
 }
 
-function Video( {tiktoks, getTiktoks, handleSnackbar, editMode, title} ) {
+function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
 
   const [notes, setNotes] = useState({})
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
@@ -52,7 +53,7 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode, title} ) {
     }
 
   }
-
+  
   useAutosave({ data: notes, onSave: updateNotes, interval: 1000 });
 
   return (
@@ -145,12 +146,25 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode, title} ) {
                   />
                 </Box>
               </TableCell>
-              <TableCell sx={{position: 'absolute', right: 0, borderBottom: 0}}>
+              <TableCell sx={{position: 'absolute', right: "0.2rem", marginTop: "0.34rem"}}>
                 {
                   editMode &&
-                  <IconButton onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}} sx={{position: 'absolute', right: 0.01, color: "#de8590"}}>
-                    <DeleteIcon/>
-                  </IconButton>
+                  <Box sx={{display: "flex", justifyContent: "center", backgroundColor: "#ffd8be", borderRadius: "2rem"}}>
+                    {tiktok.order > 0 &&
+                      <IconButton size="small" onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order - 1}); getTiktoks()}}>
+                        <KeyboardArrowUpIcon size="small" sx={{color: "#de8590"}}/>
+                      </IconButton>
+                    }
+                    {tiktok.order < tiktoks.length - 1 &&
+                      <IconButton size="small" onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order + 1}); getTiktoks()}}>
+                        <KeyboardArrowDownIcon size="small" sx={{color: "#de8590"}}/>
+                      </IconButton>
+                    }
+                    <IconButton size="small" onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}}>
+                      <DeleteIcon size="small" sx={{color: "#de8590"}}/>
+                    </IconButton>
+                  
+                  </Box>
                 }
               </TableCell>
             </TableRow>
