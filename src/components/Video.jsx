@@ -151,12 +151,12 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
                   editMode &&
                   <Box sx={{display: "flex", justifyContent: "center", backgroundColor: "#ffd8be", borderRadius: "2rem"}}>
                     {tiktok.order > 0 &&
-                      <IconButton size="small" onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order + 1}); getTiktoks()}}>
+                      <IconButton size="small" onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order - 1}); getTiktoks()}}>
                         <KeyboardArrowDownIcon size="small" sx={{color: "#de8590"}}/>
                       </IconButton>
                     }
-                    {tiktok.order < tiktoks.length - 1 &&
-                      <IconButton size="small" onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order - 1}); getTiktoks()}}>
+                    {tiktok.order < tiktoks.length &&
+                      <IconButton size="small" onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order + 1}); getTiktoks()}}>
                         <KeyboardArrowUpIcon size="small" sx={{color: "#de8590"}}/>
                       </IconButton>
                     }
