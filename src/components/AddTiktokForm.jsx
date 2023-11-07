@@ -9,7 +9,7 @@ const addTiktokFormCountStyle = {
     gap: "10%"
 }
 
-function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks}) {
+function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackbar}) {
     const params = useParams();
 
     const [addTiktokForm, setAddTiktokForm] = useState({

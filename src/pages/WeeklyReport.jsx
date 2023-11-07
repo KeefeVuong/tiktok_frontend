@@ -127,6 +127,7 @@ function WeeklyReport({handleSnackbar}) {
       openAddTiktok={openAddTiktok}
       handleAddTiktok={handleAddTiktok}
       getTiktoks={getTiktoks}
+      handleSnackbar={handleSnackbar}
       />
     </>
   )
