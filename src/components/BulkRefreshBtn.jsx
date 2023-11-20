@@ -18,6 +18,7 @@ function BulkRefreshBtn({ selected, handleSnackbar, handleSuccessFetch }) {
         for (let i in selected) {
             await APIFetch(`/api/weekly-reports/${selected[i]}`, "GET")
             .then((tiktokData) => {
+                tiktokData = tiktokData["tiktok"]
                 for (let j in tiktokData) {
                     if (!tiktokData[j]["manual"]) {
                         urls.push(tiktokData[j]["url"])
@@ -29,7 +30,7 @@ function BulkRefreshBtn({ selected, handleSnackbar, handleSuccessFetch }) {
                 handleSnackbar(true, "ERROR: Get Tiktok Urls")
             })
         }
-        
+
         await APIFetch("/api/tiktoks/", "PUT", {"urls": urls})
         .then(() => {
             handleSuccessFetch("SUCCESS: Bulk Refresh Stats")

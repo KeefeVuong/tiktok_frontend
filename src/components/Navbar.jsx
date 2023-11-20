@@ -95,7 +95,7 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
                                         <MenuIcon />
                                     </IconButton>) : null}
                                     <Avatar alt="Cheekyglo Logo" src={logo} component="a" href="https://www.tiktok.com/@cheekyglo" target="_blank" />
-                                    <Typography variant="h6" component="span">
+                                    <Typography variant="h6" component="span" sx={{'&:hover': {cursor: 'pointer'}}} onClick={() => {sessionStorage.clear(); getWeeklyReports()}}>
                                         Tiktok Dashboard
                                     </Typography>
                                 </>
