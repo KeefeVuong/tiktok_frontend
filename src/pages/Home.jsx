@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from 'react'
 import { Box, Typography, Skeleton, Link, Drawer, IconButton, Container, Slider } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { factoriseNum, graphData, renderImprovements } from "../Helper.jsx"
+import { APIFetch, factoriseNum, graphData, renderImprovements } from "../Helper.jsx"
 import Navbar from "../components/Navbar"
 import useWeeklyReports from '../hooks/useWeeklyReports.jsx';
 import LoadingBackdrop from '../components/LoadingBackdrop.jsx';
@@ -21,6 +21,7 @@ import { Line } from 'react-chartjs-2';
 import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import GraphScale from '../components/GraphScale.jsx';
+import EdiText from 'react-editext';
 
 ChartJS.register(
   CategoryScale,
@@ -33,91 +34,7 @@ ChartJS.register(
   LogarithmicScale
 );
 
-const columns = [
-    { 
-      field: 'title', 
-      width: 200,
-      renderHeader: () => {
-        return (
-          <Typography fontWeight="bold">Title</Typography>
-        )
-      },
-      renderCell: (params) => {
-        if (params.row.last_updated === "loading") {
-          return <Skeleton animation="wave" width="100%" />
-        }
-        const id = params.row.id
-        const frag = `#weekly-report/${id}`
-        return (
-          <Link sx={{color: "#de8590", fontWeight: "bold"}} underline="none" href={frag}>{params.row.title}</Link>
-        )
-      }
-    },
-    { field: 'total_views', width: 150,
-      renderHeader: () => {
-        return (
-          <Typography fontWeight="bold">Total Views</Typography>
-        )
-      }, 
-      renderCell: (params) => {
-        if (params.row.last_updated === "loading") {
-          return <Skeleton animation="wave" width="100%" />
-        }
-        return renderImprovements(params.row.total_views, params.row.total_improvement_views, params.row.last_updated)
-      }
-    },
-    { field: 'total_likes', width: 150, 
-      renderHeader: () => {
-        return (
-          <Typography fontWeight="bold">Total Likes</Typography>
-        )
-      },
-      renderCell: (params) => {
-        if (params.row.last_updated === "loading") {
-          return <Skeleton animation="wave" width="100%" />
-        }
-        return renderImprovements(params.row.total_likes, params.row.total_improvement_likes, params.row.last_updated)
-      }
-  },
-    { field: 'total_comments', width: 185, 
-      renderHeader: () => {
-        return (
-          <Typography fontWeight="bold">Total Comments</Typography>
-        )
-      },
-      renderCell: (params) => {
-        if (params.row.last_updated === "loading") {
-          return <Skeleton animation="wave" width="100%" />
-        }
-        return renderImprovements(params.row.total_comments, params.row.total_improvement_comments, params.row.last_updated)
-      }
-  },
-    { field: 'total_favourites', width:185, 
-      renderHeader: () => {
-        return (
-          <Typography fontWeight="bold">Total Favourites</Typography>
-        )
-      },
-      renderCell: (params) => {
-        if (params.row.last_updated === "loading") {
-          return <Skeleton animation="wave" width="100%" />
-        }
-        return renderImprovements(params.row.total_favourites, params.row.total_improvement_favourites, params.row.last_updated)
-      }
-  },
-    { field: 'last_updated', width:175,
-    renderHeader: () => {
-      return (
-        <Typography fontWeight="bold">Last Updated</Typography>
-      )
-    },
-    renderCell: (params) => {
-      if (params.row.last_updated === "loading") {
-        return <Skeleton animation="wave" width="100%" />
-      }
-    }
-  },
-];
+
 
 function Home({handleSnackbar}) {
   const [weeklyReports, setWeeklyReports] = useState([])
@@ -129,6 +46,122 @@ function Home({handleSnackbar}) {
   const [graphXScale, setGraphXScale] = useState([])
   const [adjustYAxis, setAdjustYAxis] = useState(false)
 
+  const editTitle = async (value, weekly_report_id) => {
+    await APIFetch(`/api/weekly-reports/${weekly_report_id}`, "PUT", { "title": value })
+    .then(() => {
+      sessionStorage.clear();
+      handleSnackbar(true, "SUCCESS: Update Weekly Report Title");
+      getWeeklyReports();
+    })
+    .catch((error) => {
+        console.error(error.message);
+        handleSnackbar(true, "ERROR: Update Weekly Report Title");
+    })
+}
+
+  const columns = [
+      { 
+        field: 'title', 
+        width: 200,
+        renderHeader: () => {
+          return (
+            <Typography fontWeight="bold">Title</Typography>
+          )
+        },
+        renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
+          const id = params.row.id
+          const frag = `#weekly-report/${id}`
+          return (
+                <EdiText 
+                submitOnEnter
+                cancelOnEscape
+                submitOnUnfocus
+                showButtonsOnHover
+                onSave={(value) => {
+                  editTitle(value, params.row.id)
+                }}
+                value={params.row.title}
+                renderValue={(value) => {
+                  return (
+                  <Link sx={{color: "#de8590", fontWeight: "bold"}} underline="none" href={frag}>
+                    {value}
+                  </Link>
+                  )
+                }}
+                type="text"
+                />
+          )
+        }
+      },
+      { field: 'total_views', width: 150,
+        renderHeader: () => {
+          return (
+            <Typography fontWeight="bold">Total Views</Typography>
+          )
+        }, 
+        renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
+          return renderImprovements(params.row.total_views, params.row.total_improvement_views, params.row.last_updated)
+        }
+      },
+      { field: 'total_likes', width: 150, 
+        renderHeader: () => {
+          return (
+            <Typography fontWeight="bold">Total Likes</Typography>
+          )
+        },
+        renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
+          return renderImprovements(params.row.total_likes, params.row.total_improvement_likes, params.row.last_updated)
+        }
+    },
+      { field: 'total_comments', width: 185, 
+        renderHeader: () => {
+          return (
+            <Typography fontWeight="bold">Total Comments</Typography>
+          )
+        },
+        renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
+          return renderImprovements(params.row.total_comments, params.row.total_improvement_comments, params.row.last_updated)
+        }
+    },
+      { field: 'total_favourites', width:185, 
+        renderHeader: () => {
+          return (
+            <Typography fontWeight="bold">Total Favourites</Typography>
+          )
+        },
+        renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
+          return renderImprovements(params.row.total_favourites, params.row.total_improvement_favourites, params.row.last_updated)
+        }
+    },
+      { field: 'last_updated', width:175,
+      renderHeader: () => {
+        return (
+          <Typography fontWeight="bold">Last Updated</Typography>
+        )
+      },
+      renderCell: (params) => {
+        if (params.row.last_updated === "loading") {
+          return <Skeleton animation="wave" width="100%" />
+        }
+      }
+    },
+  ];
+  
   const handleOpenGraphs = () => {
     setOpenGraphs(!openGraphs)
   }
