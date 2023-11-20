@@ -24,6 +24,7 @@
     "react-autosave": "^0.4.2",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-editext": "^6.0.0",
     "react-router-dom": "^6.15.0",
     "react-scroll": "^1.9.0",
     "tinymce": "^6.7.0"
