@@ -1,7 +1,6 @@
 import { React, useState } from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button, Box, Divider } from '@mui/material';
 import { useParams } from 'react-router-dom';
-import { APIFetch } from "../Helper.jsx"
 
 const addTiktokFormCountStyle = {
     display: "flex",
@@ -15,15 +14,19 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
     const [imagePreview, setImagePreview] = useState(null);
     const [addTiktokForm, setAddTiktokForm] = useState({
         weekly_report: params.id,
-        url: "",
-        like_count: 0,
-        view_count: 0,
-        comment_count: 0,
-        favourite_count: 0,
+        url: null,
+        like_count: null,
+        view_count: null,
+        comment_count: null,
+        favourite_count: null,
         thumbnail: null
     });
 
     const addTiktok = async () => {
+        if (!Object.values(addTiktokForm).every(value => value !== null)) {
+            handleSnackbar(true, "ERROR: Please ensure all fields are filled out")
+            return;
+        }
 
         const formData = new FormData();
         formData.append('thumbnail', addTiktokForm["thumbnail"]);
@@ -45,6 +48,15 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
         .then(() => {
             getTiktoks();
             setImagePreview(null)
+            setAddTiktokForm({
+                weekly_report: params.id,
+                url: null,
+                like_count: null,
+                view_count: null,
+                comment_count: null,
+                favourite_count: null,
+                thumbnail: null
+            })
         })
         .catch((e) => {
             console.error(e.message)
@@ -80,7 +92,8 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
                 
             </DialogContentText>
             <Box sx={{display: "flex", flexDirection: "column", "alignItems": "center"}}>
-                <img src={imagePreview} height="375px" width= "200px"/>
+                {imagePreview !== null && 
+                <img src={imagePreview} height="375px" width= "200px" border="1px solid black"/>}
                 <Button
                     variant="contained"
                     component="label"
