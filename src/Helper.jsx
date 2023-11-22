@@ -8,7 +8,7 @@ export const APIFetch = async (path, method, body) => {
     headers: {
       'Authorization': `${localStorage.getItem("token")}`,
       // 'Authorization': 'Token 838fde2cfe52cf25e4aa5f6ac90f3ff8418f0c58',
-      'Content-Type' : 'application/json',
+      'Content-Type' : "application/json",
     },
     body: method === 'GET' ? undefined : JSON.stringify(body)
   }

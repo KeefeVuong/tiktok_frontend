@@ -60,7 +60,7 @@ function WeeklyReport({handleSnackbar}) {
   const getTiktoks = async () => {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
     .then((data) => {
-      setTiktoks(data["tiktok"])
+      setTiktoks(data["tiktok"].reverse())
       setWeeklyReport(data["weekly_report"])
     })
     .catch((e) => {
@@ -127,6 +127,7 @@ function WeeklyReport({handleSnackbar}) {
       openAddTiktok={openAddTiktok}
       handleAddTiktok={handleAddTiktok}
       getTiktoks={getTiktoks}
+      handleSnackbar={handleSnackbar}
       />
     </>
   )

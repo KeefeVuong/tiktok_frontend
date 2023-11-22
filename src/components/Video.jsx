@@ -1,5 +1,5 @@
-import { React, useState } from 'react'
-import { Box, IconButton, TextField, Typography, Divider, Button } from '@mui/material';
+import { React, useState, useRef } from 'react'
+import { Box, IconButton, TextField, Typography, Divider, Button, Hidden } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -12,6 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DeleteTiktokForm from "./DeleteTiktokForm";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Link as ScrollLink, scroller, animateScroll } from 'react-scroll';
 
 const tiktok_stats_style = {
   height:"375px", 
@@ -51,9 +52,16 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
       handleSnackbar(true, "SUCCESS: Saved Notes")
       setNotes({})
     }
-
   }
-  
+
+  const moveTiktok = async (tiktok, direction) => {
+    await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: direction === "up" ? tiktok.order + 1 : tiktok.order - 1}); 
+    await getTiktoks();
+
+    animateScroll.scrollMore(direction === "up" ? -410 : 410);
+  }
+
+
   useAutosave({ data: notes, onSave: updateNotes, interval: 1000 });
 
   return (
@@ -146,28 +154,25 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
                   />
                 </Box>
               </TableCell>
-              <TableCell sx={{position: 'absolute', right: "0.2rem", marginTop: "0.34rem"}}>
-                {
-                  editMode &&
-                  <Box sx={{display: "flex", justifyContent: "center", backgroundColor: "#ffd8be", borderRadius: "2rem"}}>
-                    {tiktok.order > 0 &&
-                      <IconButton size="small" onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order - 1}); getTiktoks()}}>
-                        <KeyboardArrowUpIcon size="small" sx={{color: "#de8590"}}/>
+              {
+                editMode &&
+                <TableCell sx={{position: 'absolute', right: "0.2rem", marginTop: "0.34rem"}}>
+                    <Box sx={{display: "flex", justifyContent: "center", backgroundColor: "#ffd8be", borderRadius: "2rem"}}>
+                        <IconButton id={`${tiktok.id}-down`} size="small" onClick={() => {moveTiktok(tiktok, "down")}} disabled={!(tiktok.order > 0)}>
+                          <KeyboardArrowDownIcon size="small" sx={{color: (theme) => (!(tiktok.order > 0) ? theme.palette.text.disabled : '#de8590')}}/>
+                        </IconButton>
+                      <IconButton size="small" onClick={() => {moveTiktok(tiktok, "up")}} disabled={!(tiktok.order < tiktoks.length - 1)}>
+                        <KeyboardArrowUpIcon size="small" sx={{color: (theme) => (!(tiktok.order < tiktoks.length - 1) ? theme.palette.text.disabled : '#de8590')}}/>
                       </IconButton>
-                    }
-                    {tiktok.order < tiktoks.length - 1 &&
-                      <IconButton size="small" onClick={async () => {await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: tiktok.order + 1}); getTiktoks()}}>
-                        <KeyboardArrowDownIcon size="small" sx={{color: "#de8590"}}/>
+                      
+                      <IconButton size="small" onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}}>
+                        <DeleteIcon size="small" sx={{color: "#de8590"}}/>
                       </IconButton>
-                    }
-                    <IconButton size="small" onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}}>
-                      <DeleteIcon size="small" sx={{color: "#de8590"}}/>
-                    </IconButton>
-                  
-                  </Box>
-                }
-              </TableCell>
-            </TableRow>
+                    
+                    </Box>
+                </TableCell>
+              }
+          </TableRow>
           ))}
         </TableBody>
       </Table>
