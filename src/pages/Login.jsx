@@ -62,6 +62,14 @@ function Login({handleSnackbar}) {
       })
     }
 
+    const loginAsGuest = (e) => {
+      setLoginForm({
+        username: "guest",
+        password: "guest"
+      })
+      submitForm(e);
+    }
+
     const submitForm = async (e) => {
       e.preventDefault()
       await APIFetch("/api-token-auth/", "POST", loginForm)
@@ -94,6 +102,7 @@ function Login({handleSnackbar}) {
     
     <Box sx={containerStyle}> 
       <Paper component="form" onSubmit={submitForm} elevation={2} sx={paperStyle}>
+        <Button onClick={loginAsGuest} sx={{marginBottom: "1rem", color: "#e6929c"}}>Guest Mode</Button>
         <Box sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
           <Avatar alt="Cheekyglo Logo" src={logo} component="span" sx={{ width: 100, height: 100}}/>
           <Typography variant="h4"> 
