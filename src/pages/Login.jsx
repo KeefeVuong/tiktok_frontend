@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from 'react'
-import { Container, TextField, Box, Button, Paper, Typography, Avatar } from '@mui/material';
+import { Container, TextField, Box, Button, Paper, Typography, Avatar, Tooltip } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import {
     useNavigate
@@ -9,6 +9,7 @@ import logo from "../assets/logo.jpg"
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import useAuth from '../hooks/useAuth.jsx';
+import InfoIcon from '@mui/icons-material/Info';
 
 const containerStyle = {
   height: '100vh',
@@ -27,7 +28,7 @@ const boxStyle = {
 
 const paperStyle = {
   marginTop: "-5rem",
-  padding: "2rem",
+  padding: "1rem 2rem 2rem 2rem",
   width: "20%",
   minWidth: "300px",
 }
@@ -63,26 +64,29 @@ function Login({handleSnackbar}) {
     }
 
     const loginAsGuest = (e) => {
-      setLoginForm({
+      const guestLogin = {
         username: "guest",
         password: "guest"
-      })
-      submitForm(e);
+      }
+
+      setLoginForm(guestLogin)
+        
+      submitForm(e, guestLogin);
     }
 
-    const submitForm = async (e) => {
+    const submitForm = async (e, loginDetails) => {
       e.preventDefault()
-      await APIFetch("/api-token-auth/", "POST", loginForm)
+      await APIFetch("/api-token-auth/", "POST", loginDetails)
       .then((data) => {
           let users = JSON.parse(localStorage.getItem("users")) ?? []
           let acc = {}
-          acc[loginForm["username"]] = `Token ${data.token}`
+          acc[loginDetails["username"]] = `Token ${data.token}`
           if (!users.some(user => JSON.stringify(user) === JSON.stringify(acc))) {
             users.push(acc)
           }
 
           localStorage.setItem("token", `Token ${data.token}`);
-          localStorage.setItem("currentUser", loginForm["username"])
+          localStorage.setItem("currentUser", loginDetails["username"])
           localStorage.setItem("users", JSON.stringify(users))
           setAuth(true)
           navigate("/");
@@ -101,8 +105,15 @@ function Login({handleSnackbar}) {
  return (
     
     <Box sx={containerStyle}> 
-      <Paper component="form" onSubmit={submitForm} elevation={2} sx={paperStyle}>
-        <Button onClick={loginAsGuest} sx={{marginBottom: "1rem", color: "#e6929c"}}>Guest Mode</Button>
+      <Paper component="form" onSubmit={(e) => {submitForm(e, loginForm)}} elevation={2} sx={paperStyle}>
+        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '3rem'}}>
+          <Button onClick={loginAsGuest} sx={{color: "#e6929c", ':hover': {backgroundColor: "white"}}}>
+            Guest Mode
+          </Button>
+          <Tooltip sx={{color: "#e6929c"}} arrow title="Click here for Guest access to the website. Most functionality has been disabled however feel free to look around!">
+            <InfoIcon fontSize="small"/>
+          </Tooltip>
+        </Box>
         <Box sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
           <Avatar alt="Cheekyglo Logo" src={logo} component="span" sx={{ width: 100, height: 100}}/>
           <Typography variant="h4"> 
