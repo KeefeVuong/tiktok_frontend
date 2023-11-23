@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from 'react'
-import { Container, TextField, Box, Button, Paper, Typography, Avatar } from '@mui/material';
+import { Container, TextField, Box, Button, Paper, Typography, Avatar, Zoom } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import {
     useNavigate
@@ -9,6 +9,7 @@ import logo from "../assets/logo.jpg"
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import useAuth from '../hooks/useAuth.jsx';
+import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
 
 const containerStyle = {
   height: '100vh',
@@ -43,6 +44,18 @@ const mainButton  = {
   ":hover": {
     backgroundColor: "#e6929c",
   }
+}
+
+const backToDashboardButton = {
+  position: "absolute",
+  margin: "1rem",
+  padding: "1",
+  color: "#e6929c",
+  backgroundColor: "white",
+  ":hover": {
+    backgroundColor: "white",
+  },
+  transitionDelay: "400ms"
 }
 
 function AddAccount({handleSnackbar}) {
@@ -84,7 +97,13 @@ function AddAccount({handleSnackbar}) {
     }
 
  return (
-    
+    <>
+    <Zoom in={true} style={backToDashboardButton}>
+      <Button variant="filled" component="a" href="#/">
+        <SubdirectoryArrowLeftIcon sx={{marginRight: "0.5rem"}}/>
+        Back To Dashboard
+      </Button>
+    </Zoom>
     <Box sx={containerStyle}> 
       <Paper component="form" onSubmit={submitForm} elevation={2} sx={paperStyle}>
         <Box sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
@@ -116,6 +135,7 @@ function AddAccount({handleSnackbar}) {
 
       </Paper>
     </Box>
+    </>
   );
 }
 
