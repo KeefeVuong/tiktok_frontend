@@ -20,9 +20,7 @@ function BulkRefreshBtn({ selected, handleSnackbar, handleSuccessFetch }) {
             .then((tiktokData) => {
                 tiktokData = tiktokData["tiktok"]
                 for (let j in tiktokData) {
-                    if (!tiktokData[j]["manual"]) {
-                        urls.push(tiktokData[j]["url"])
-                    }
+                    urls.push(tiktokData[j]["url"])
                 }
             })
             .catch((e) => {
