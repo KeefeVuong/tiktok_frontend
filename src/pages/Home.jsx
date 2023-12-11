@@ -298,7 +298,7 @@ function Home({handleSnackbar}) {
         <Box color="white" sx={{position: "absolute", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#de8590", height: "65px", width: "100%"}}>
           <TimelineIcon sx={{marginRight: "0.25rem"}}/>
           <Typography fontWeight="bold">
-              Tiktok Analytics
+              Dashboard Analytics
           </Typography>
         </Box>
         <Container sx={{display: "flex", flexDirection: "column", justifyContent: "start", margin: "5.5rem 2rem 0rem 2rem", height: "100%"}} maxWidth="md">

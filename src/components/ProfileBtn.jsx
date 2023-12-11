@@ -1,5 +1,6 @@
-import { React, useState } from 'react';
-import { Button, Typography, Avatar, Menu, MenuItem, Divider,ListItemIcon } from '@mui/material';
+import { React, useState, useContext } from 'react';
+import { Button, Typography, Avatar, Menu, MenuItem, Divider,ListItemIcon, Box, Badge} from '@mui/material';
+import { styled } from '@mui/material/styles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import logo from "../assets/logo.jpg"
 import LogoutBtn from './LogoutBtn';
@@ -9,6 +10,9 @@ import useAuth from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import SwitchAccount from './SwitchAccount';
 import SettingsForm from './SettingsForm';
+import instagram_logo from "../assets/instagram_logo.png";
+import tiktok_logo from "../assets/tiktok_logo.png";
+import { usePlatformContext } from './PlatformContext';
 
 const profilePicStyle = {
     marginRight: 0.75,
@@ -17,12 +21,23 @@ const profilePicStyle = {
     backgroundColor: "#f4be69"
 }
 
+const platforms = {
+  "&:hover": {
+    transform: "scale(1.2)",
+    cursor: "pointer"
+  },
+  border: "3px solid",
+  borderColor: "white",
+  borderRadius: "10px"
+}
+
 function ProfileBtn() {
-    const {currentUser} = useAuth()
-    const [users, setUsers] = useState(JSON.parse(localStorage.getItem("users")) ?? [])
-    const [openSettingsModal, setOpenSettingsModal] = useState(false)
-    
-    const handleSettingsModal = () => {
+  const {currentUser} = useAuth()
+  const [users, setUsers] = useState(JSON.parse(localStorage.getItem("users")) ?? [])
+  const [openSettingsModal, setOpenSettingsModal] = useState(false)
+  const {platform, setPlatform} = usePlatformContext();
+  
+  const handleSettingsModal = () => {
       setOpenSettingsModal(!openSettingsModal)
     }
 
@@ -59,7 +74,7 @@ function ProfileBtn() {
               anchorEl={anchorEl}
               open={open}
               onClose={handleClose}
-              onClick={handleClose}
+              // onClick={handleClose}
               PaperProps={{
                 elevation: 0,
                 sx: {
@@ -89,6 +104,13 @@ function ProfileBtn() {
               transformOrigin={{ horizontal: 'right', vertical: 'top' }}
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
+        {/* <Typography sx={{textAlign: "center", marginBottom: "10px", marginTop: "5px"}}>Switch to Instagram</Typography>
+        <Divider sx={{marginBottom: "10px"}}/> */}
+        <Box sx={{display: "flex", justifyContent: "center", marginBottom: "7px", gap: "5px"}}>
+            <Avatar alt="tiktok logo" sx={platforms} style={{borderColor: platform === "tiktok" ? "#de8590" : "",}} src={tiktok_logo} onClick={() => setPlatform("tiktok")}/>
+            <Avatar alt="instagram logo" sx={platforms} style={{borderColor: platform === "instagram" ? "#de8590" : "",}} src={instagram_logo} onClick={() => setPlatform("instagram")}/>
+        </Box>
+        <Divider sx={{marginBottom: "10px"}}/>
         {users.map((user, i) => {
           let name = Object.keys(user)[0]
           let token = user[name]
@@ -104,6 +126,12 @@ function ProfileBtn() {
         }
 
         <Divider sx={{marginBottom: "10px"}}/>
+        {/* <MenuItem>
+          <ListItemIcon>
+            <img src={instagram_logo} height="23px" width="23px"></img>
+          </ListItemIcon>
+          Switch to Instagram
+        </MenuItem> */}
         <MenuItem onClick={addAccountBtnClick}>
           <ListItemIcon>
             <PersonAdd fontSize="small" />

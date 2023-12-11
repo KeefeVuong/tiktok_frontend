@@ -1,7 +1,7 @@
 import React from 'react'
 import { Avatar, MenuItem } from '@mui/material';
 
-function SwitchAccount({user, token, key}) {
+function SwitchAccount({user, token}) {
 
     const switchAccount = () => {
         localStorage.setItem("token", token);
@@ -11,7 +11,7 @@ function SwitchAccount({user, token, key}) {
     }
 
     return (
-        <MenuItem key={key} onClick={switchAccount}>
+        <MenuItem onClick={switchAccount}>
             <Avatar sx={{backgroundColor: "#f4be69"}}>{user.charAt(0).toUpperCase()}</Avatar>
             {user}
         </MenuItem>
