@@ -1,7 +1,10 @@
 import { React, useState } from 'react'
 import { APIFetch } from '../Helper'
+import { usePlatformContext } from '../components/PlatformContext'
 
 function useWeeklyReports({handleSnackbar, selected, setSelected, setWeeklyReports}) {
+
+    const {platform, _} = usePlatformContext()
 
     const deleteWeeklyReports = async () => {
         sessionStorage.clear()
@@ -16,12 +19,13 @@ function useWeeklyReports({handleSnackbar, selected, setSelected, setWeeklyRepor
     
     const getWeeklyReports = async () => {
         if (sessionStorage.getItem("weeklyReports") !== null) {
-            setWeeklyReports(JSON.parse(sessionStorage.getItem("weeklyReports")))
+            setWeeklyReports(JSON.parse(sessionStorage.getItem(`${platform}WeeklyReports`)))
             return
         }
         await APIFetch("/api/weekly-reports/", "GET")
         .then((weeklyReportData) => {
-            sessionStorage.setItem("weeklyReports", JSON.stringify(weeklyReportData.reverse()))
+            weeklyReportData = weeklyReportData.filter((weeklyReport) => weeklyReport["platform"] == platform)
+            sessionStorage.setItem(`${platform}WeeklyReports`, JSON.stringify(weeklyReportData.reverse()))
             setWeeklyReports(weeklyReportData)
             setSelected([])
         })

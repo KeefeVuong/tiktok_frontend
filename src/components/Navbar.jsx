@@ -9,6 +9,7 @@ import CreateWeeklyReportForm from './CreateWeeklyReportForm';
 import BulkRefreshBtn from './BulkRefreshBtn';
 import LogoutBtn from './LogoutBtn';
 import ProfileBtn from "./ProfileBtn";
+import { usePlatformContext } from './PlatformContext';
 
 const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) => {
     const location = useLocation();
@@ -17,6 +18,8 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
     const [openAddModal, setOpenAddModal] = useState(false);
     const [menuAnchorEl, setMenuAnchorEl] = useState(null);
     const [isMobile, setIsMobile] = useState(false);
+
+    const {platform, _} = usePlatformContext();
 
     const handleAddModal = () => {
         setOpenAddModal(!openAddModal);
@@ -81,7 +84,7 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
     return (
         <>
             <Box sx={{ flexGrow: 1 }}>
-                <AppBar position="fixed" sx={{ backgroundColor: "#de8590" }}>
+                <AppBar position="fixed" sx={{ backgroundColor: platform === "tiktok" ? "#de8590" : "#e34278"}}>
                     <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap:"10px" }}>
                             {navbarMode === "home" ? (
@@ -96,7 +99,7 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
                                     </IconButton>) : null}
                                     <Avatar alt="Cheekyglo Logo" src={logo} component="a" href="https://www.tiktok.com/@cheekyglo" target="_blank" />
                                     <Typography variant="h6" component="span" sx={{'&:hover': {cursor: 'pointer'}}} onClick={() => {sessionStorage.clear(); getWeeklyReports()}}>
-                                        Tiktok Dashboard
+                                        {platform[0].toUpperCase() + platform.substring(1)} Dashboard
                                     </Typography>
                                 </>
                             ) :  
