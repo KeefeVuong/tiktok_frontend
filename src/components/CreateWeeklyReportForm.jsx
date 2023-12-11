@@ -23,15 +23,15 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
     const [modalData, setModalData] = useState({
         number_of_videos: "",
         title: "",
-        tiktok_account: "Loading..."
+        account: "Loading..."
     })
 
-    const getTiktokAccount = async () => {
+    const getPlatformAccount = async () => {
         await APIFetch("/api/client/", "GET")
         .then((data) => {
             setModalData({
                 ...modalData,
-                ["tiktok_account"]: data["tiktok_account"]
+                ["account"]: data["tiktok_account"]
             })
         })
         .catch((e) => {
@@ -57,7 +57,7 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
     }
 
     const createWeeklyReport = async () => {
-        if (modalData["number_of_videos"] === "" || modalData["title"] === "" || modalData["tiktok_account"] === "") {
+        if (modalData["number_of_videos"] === "" || modalData["title"] === "" || modalData["account"] === "") {
             handleSnackbar(true, "ERROR: Ensure all fields are completed")
             return
         }
@@ -82,7 +82,7 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
     }
 
     useEffect(() => {
-        openAddModal === true ? getTiktokAccount() : null
+        openAddModal === true ? getPlatformAccount() : null
     }, [openAddModal])
 
     return (
@@ -100,7 +100,7 @@ function CustomModal({ handleAddModal, openAddModal, handleSnackbar, handleSucce
                     fullWidth
                     required
                     disabled
-                    value={modalData["tiktok_account"]}
+                    value={modalData["account"]}
                     />
                 </Tooltip>
 

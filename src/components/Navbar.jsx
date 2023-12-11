@@ -5,7 +5,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import FastRewindIcon from '@mui/icons-material/FastRewind';
 import MenuIcon from '@mui/icons-material/Menu';
 import logo from "../assets/logo.jpg";
-import CustomModal from './CustomModal';
+import CreateWeeklyReportForm from './CreateWeeklyReportForm';
 import BulkRefreshBtn from './BulkRefreshBtn';
 import LogoutBtn from './LogoutBtn';
 import ProfileBtn from "./ProfileBtn";
@@ -151,7 +151,7 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
                 ) : null}
             </Menu>
 
-        <CustomModal 
+        <CreateWeeklyReportForm 
         handleAddModal={handleAddModal} 
         openAddModal={openAddModal} 
         handleSnackbar={handleSnackbar}

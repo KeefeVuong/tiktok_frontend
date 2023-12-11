@@ -9,12 +9,12 @@ import TableRow from '@mui/material/TableRow';
 import { Autosave, useAutosave } from 'react-autosave';
 import { APIFetch, renderImprovements } from "../Helper.jsx"
 import DeleteIcon from '@mui/icons-material/Delete';
-import DeleteTiktokForm from "./DeleteTiktokForm";
+import DeleteVideoForm from "./DeleteVideoForm";
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Link as ScrollLink, scroller, animateScroll } from 'react-scroll';
 
-const tiktok_stats_style = {
+const video_stats_style = {
   height:"375px", 
   backgroundColor: "#FADADD",
   border: "1px solid #f2e6e8",
@@ -25,24 +25,24 @@ const tiktok_stats_style = {
   width: "200px"
 }
 
-function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
+function Video( {videos, getVideos, handleSnackbar, editMode} ) {
 
   const [notes, setNotes] = useState({})
   const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
   const [toDelete, setToDelete] = useState("")
 
-  const handleNotes = (tiktokID, type, newNote) => {
+  const handleNotes = (videoID, type, newNote) => {
     let updatedNotes = { ...notes };
-    if (updatedNotes[tiktokID] === undefined) {
-      updatedNotes[tiktokID] = {}
+    if (updatedNotes[videoID] === undefined) {
+      updatedNotes[videoID] = {}
     }
-    updatedNotes[tiktokID][type] = newNote;
+    updatedNotes[videoID][type] = newNote;
     setNotes(updatedNotes);
   }
 
   const updateNotes = async () => {
-    for (let tiktokId in notes) {
-        await APIFetch(`/api/tiktoks/${tiktokId}`, "PUT", notes[tiktokId])
+    for (let videoId in notes) {
+        await APIFetch(`/api/videos/${videoId}`, "PUT", notes[videoId])
         .catch((e) => {
           console.error(e.message)
           handleSnackbar(true, "ERROR: Saved Notes")
@@ -54,9 +54,9 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
     }
   }
 
-  const moveTiktok = async (tiktok, direction) => {
-    await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: direction === "up" ? tiktok.order + 1 : tiktok.order - 1}); 
-    await getTiktoks();
+  const movevideo = async (video, direction) => {
+    await APIFetch(`/api/videos/${video.id}`, 'PUT', {order: direction === "up" ? video.order + 1 : video.order - 1}); 
+    await getVideos();
 
     animateScroll.scrollMore(direction === "up" ? -410 : 410);
   }
@@ -77,12 +77,12 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
           <TableRow sx={{backgroundColor: "#FFD8BE"}}>
             <TableCell width="10%">
             <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
-              <Typography component="h1"><Box component="span" fontWeight="bold">Tiktok Thumbnail</Box></Typography>
+              <Typography component="h1"><Box component="span" fontWeight="bold">Video Thumbnail</Box></Typography>
               </Box>
             </TableCell>
             <TableCell width="10%">
               <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
-              <Typography component="h1"><Box component="span" fontWeight="bold">Tiktok Statistics</Box></Typography>
+              <Typography component="h1"><Box component="span" fontWeight="bold">Video Statistics</Box></Typography>
               </Box>
             </TableCell>
             <TableCell>
@@ -93,29 +93,29 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {tiktoks.map((tiktok) => (
+          {videos.map((video) => (
             <TableRow
-              key={tiktok.id}
+              key={video.id}
             >
               <TableCell>
-                <a href={tiktok.url} target="_blank">
+                <a href={video.url} target="_blank">
                   <img 
-                  alt="tiktok thumbnail" 
-                  src={tiktok.thumbnail}
+                  alt="video thumbnail" 
+                  src={video.thumbnail}
                   height="375px"
                   width="200px"
                   />
                 </a>
               </TableCell>
               <TableCell>
-                <Box fontSize="17px" sx={tiktok_stats_style}>
+                <Box fontSize="17px" sx={video_stats_style}>
                   <Box>
-                    <Box>{renderImprovements(tiktok.view_count, tiktok.improvement_view_count, tiktok.last_updated, true, "Views")}</Box>
-                    <Box>{renderImprovements(tiktok.like_count, tiktok.improvement_like_count, tiktok.last_updated, true, "Likes")}</Box>
-                    <Box>{renderImprovements(tiktok.comment_count, tiktok.improvement_comment_count, tiktok.last_updated, true, "Comments")}</Box>
-                    <Box>{renderImprovements(tiktok.favourite_count, tiktok.improvement_favourite_count, tiktok.last_updated, true, "Favourites")}</Box>
+                    <Box>{renderImprovements(video.view_count, video.improvement_view_count, video.last_updated, true, "Views")}</Box>
+                    <Box>{renderImprovements(video.like_count, video.improvement_like_count, video.last_updated, true, "Likes")}</Box>
+                    <Box>{renderImprovements(video.comment_count, video.improvement_comment_count, video.last_updated, true, "Comments")}</Box>
+                    <Box>{renderImprovements(video.favourite_count, video.improvement_favourite_count, video.last_updated, true, "Favourites")}</Box>
                     <br/>
-                    <Box> <Box fontWeight={"bold"} component="span">{((tiktok.like_count + tiktok.comment_count +tiktok.share_count) / tiktok.view_count).toFixed(2)}%</Box> Engagement</Box>
+                    <Box> <Box fontWeight={"bold"} component="span">{((video.like_count + video.comment_count +video.share_count) / video.view_count).toFixed(2)}%</Box> Engagement</Box>
                   </Box>
                 </Box>
               </TableCell>
@@ -123,13 +123,13 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
                 <Box>
 
                   <TextField
-                  label={tiktok.id in notes ? "Saving" : "Hook"}
+                  label={video.id in notes ? "Saving" : "Hook"}
                   multiline
                   fullWidth
                   rows={1}
                   size="small"
-                  defaultValue={tiktok.hook}
-                  onChange={(e) => handleNotes(tiktok.id, "hook", e.target.value)}
+                  defaultValue={video.hook}
+                  onChange={(e) => handleNotes(video.id, "hook", e.target.value)}
                   sx={{marginBottom: "20px"}}
                   />
               
@@ -137,9 +137,9 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
                   multiline
                   rows={5}
                   fullWidth
-                  defaultValue={tiktok.notes}
-                  label={tiktok.id in notes ? "Saving" : "Notes"}
-                  onChange={(e) => handleNotes(tiktok.id, "notes", e.target.value)}
+                  defaultValue={video.notes}
+                  label={video.id in notes ? "Saving" : "Notes"}
+                  onChange={(e) => handleNotes(video.id, "notes", e.target.value)}
                   sx={{color: "#f5ebed", marginBottom: "20px"}}
                   />
 
@@ -148,9 +148,9 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
                   rows={5}
                   fullWidth
                   sx={{color: "#f5ebed"}}
-                  defaultValue={tiktok.improvements}
-                  label={tiktok.id in notes ? "Saving" : "Improvements"}
-                  onChange={(e) => handleNotes(tiktok.id, "improvements", e.target.value)}
+                  defaultValue={video.improvements}
+                  label={video.id in notes ? "Saving" : "Improvements"}
+                  onChange={(e) => handleNotes(video.id, "improvements", e.target.value)}
                   />
                 </Box>
               </TableCell>
@@ -158,14 +158,14 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
                 editMode &&
                 <TableCell sx={{position: 'absolute', right: "0.2rem", marginTop: "0.34rem"}}>
                     <Box sx={{display: "flex", justifyContent: "center", backgroundColor: "#ffd8be", borderRadius: "2rem"}}>
-                        <IconButton id={`${tiktok.id}-down`} size="small" onClick={() => {moveTiktok(tiktok, "down")}} disabled={!(tiktok.order > 0)}>
-                          <KeyboardArrowDownIcon size="small" sx={{color: (theme) => (!(tiktok.order > 0) ? theme.palette.text.disabled : '#de8590')}}/>
+                        <IconButton id={`${video.id}-down`} size="small" onClick={() => {movevideo(video, "down")}} disabled={!(video.order > 0)}>
+                          <KeyboardArrowDownIcon size="small" sx={{color: (theme) => (!(video.order > 0) ? theme.palette.text.disabled : '#de8590')}}/>
                         </IconButton>
-                      <IconButton size="small" onClick={() => {moveTiktok(tiktok, "up")}} disabled={!(tiktok.order < tiktoks.length - 1)}>
-                        <KeyboardArrowUpIcon size="small" sx={{color: (theme) => (!(tiktok.order < tiktoks.length - 1) ? theme.palette.text.disabled : '#de8590')}}/>
+                      <IconButton size="small" onClick={() => {movevideo(video, "up")}} disabled={!(video.order < videos.length - 1)}>
+                        <KeyboardArrowUpIcon size="small" sx={{color: (theme) => (!(video.order < videos.length - 1) ? theme.palette.text.disabled : '#de8590')}}/>
                       </IconButton>
                       
-                      <IconButton size="small" onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}}>
+                      <IconButton size="small" onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(video.id)}}>
                         <DeleteIcon size="small" sx={{color: "#de8590"}}/>
                       </IconButton>
                     
@@ -178,11 +178,11 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
       </Table>
     </TableContainer>
 
-    <DeleteTiktokForm
+    <DeleteVideoForm
     openDeleteConfirmation={openDeleteConfirmation}
     setOpenDeleteConfirmation={setOpenDeleteConfirmation}
     toDelete={toDelete}
-    getTiktoks={getTiktoks}
+    getVideos={getVideos}
     handleSnackbar={handleSnackbar}
     />
     </>

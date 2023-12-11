@@ -2,13 +2,13 @@ import { React } from 'react'
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { APIFetch } from '../Helper';
 
-function DeleteTiktokForm({openDeleteConfirmation, setOpenDeleteConfirmation, toDelete, getTiktoks, handleSnackbar}) {
+function DeleteVideoForm({openDeleteConfirmation, setOpenDeleteConfirmation, toDelete, getVideos, handleSnackbar}) {
 
-    const deleteTiktok = async () => {
+    const deleteVideo = async () => {
         setOpenDeleteConfirmation(!openDeleteConfirmation)
         await APIFetch(`/api/tiktoks/${toDelete}`, "DELETE")
         .then(() => {
-            getTiktoks()
+            getVideos()
             handleSnackbar(true, "SUCCESS: Delete Tiktok")
         })
         .catch((e) => {
@@ -23,7 +23,7 @@ function DeleteTiktokForm({openDeleteConfirmation, setOpenDeleteConfirmation, to
         onClose={() => setOpenDeleteConfirmation(false)}
         >
         <DialogTitle>
-            {"Delete selected tiktok?"}
+            {"Delete selected video?"}
         </DialogTitle>
         <DialogContent>
             <DialogContentText >
@@ -32,7 +32,7 @@ function DeleteTiktokForm({openDeleteConfirmation, setOpenDeleteConfirmation, to
         </DialogContent>
         <DialogActions>
             <Button onClick={() => setOpenDeleteConfirmation(false)}>Cancel</Button>
-            <Button onClick={deleteTiktok} autoFocus>
+            <Button onClick={deleteVideo} autoFocus>
             Delete
             </Button>
         </DialogActions>
@@ -41,4 +41,4 @@ function DeleteTiktokForm({openDeleteConfirmation, setOpenDeleteConfirmation, to
     )
 }
 
-export default DeleteTiktokForm
+export default DeleteVideoForm

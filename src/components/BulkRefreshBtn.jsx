@@ -17,10 +17,10 @@ function BulkRefreshBtn({ selected, handleSnackbar, handleSuccessFetch }) {
         let urls = []
         for (let i in selected) {
             await APIFetch(`/api/weekly-reports/${selected[i]}`, "GET")
-            .then((tiktokData) => {
-                tiktokData = tiktokData["tiktok"]
-                for (let j in tiktokData) {
-                    urls.push(tiktokData[j]["url"])
+            .then((videoData) => {
+                videoData = videoData["tiktok"]
+                for (let j in videoData) {
+                    urls.push(videoData[j]["url"])
                 }
             })
             .catch((e) => {

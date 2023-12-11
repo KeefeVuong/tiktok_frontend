@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 import { APIFetch } from "../Helper.jsx"
 import { Editor } from '@tinymce/tinymce-react';
 import { styled } from '@mui/material/styles';
-import AddTiktokForm from '../components/AddTiktokForm';
+import AddVideoForm from '../components/AddVideoForm';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
@@ -32,9 +32,9 @@ function WeeklyReport({handleSnackbar}) {
   const params = useParams();
 
   const [weeklyReport, setWeeklyReport] = useState({})
-  const [tiktoks, setTiktoks] = useState([])
+  const [videos, setVideos] = useState([])
   const [openWeeklyNotes, setOpenWeeklyNotes] = useState(false)
-  const [openAddTiktok, setOpenAddTiktok] = useState(false)
+  const [openAddVideo, setOpenAddVideo] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -42,8 +42,8 @@ function WeeklyReport({handleSnackbar}) {
     setEditMode(!editMode)
   }
 
-  const handleAddTiktok = () => {
-    setOpenAddTiktok(!openAddTiktok)
+  const handleAddVideo = () => {
+    setOpenAddVideo(!openAddVideo)
   }
 
   const handleOpenWeeklyNotes = () => {
@@ -51,16 +51,16 @@ function WeeklyReport({handleSnackbar}) {
   }
 
   const actions = [
-    { icon: <SpeedDialIcon/>, name: 'Add', onclick: handleAddTiktok },
+    { icon: <SpeedDialIcon/>, name: 'Add', onclick: handleAddVideo },
     { icon: <NotesIcon/>, name: 'Weekly Notes', onclick: handleOpenWeeklyNotes },
     { icon: <EditIcon/>, name: 'Edit', onclick: handleEditMode },
   ];
 
 
-  const getTiktoks = async () => {
+  const getVideos = async () => {
     await APIFetch(`/api/weekly-reports/${params.id}`, "GET")
     .then((data) => {
-      setTiktoks(data["tiktok"].reverse())
+      setVideos(data["tiktok"].reverse())
       setWeeklyReport(data["weekly_report"])
     })
     .catch((e) => {
@@ -72,13 +72,13 @@ function WeeklyReport({handleSnackbar}) {
 
 
   useEffect(() => {
-    getTiktoks()
+    getVideos()
   }, [])
 
   return (
     <>
       <Navbar/>
-      <Video tiktoks={tiktoks} getTiktoks={getTiktoks} handleSnackbar={handleSnackbar} editMode={editMode}/>
+      <Video videos={videos} getVideos={getVideos} handleSnackbar={handleSnackbar} editMode={editMode}/>
 
       <StyledSpeedDial
           ariaLabel="SpeedDial"
@@ -123,10 +123,11 @@ function WeeklyReport({handleSnackbar}) {
       loading={loading}
       message="Loading Tiktok Data..."
       />
-      <AddTiktokForm
-      openAddTiktok={openAddTiktok}
-      handleAddTiktok={handleAddTiktok}
-      getTiktoks={getTiktoks}
+
+      <AddVideoForm
+      openAddVideo={openAddVideo}
+      handleAddVideo={handleAddVideo}
+      getVideos={getVideos}
       handleSnackbar={handleSnackbar}
       />
     </>

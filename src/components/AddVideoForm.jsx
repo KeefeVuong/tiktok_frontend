@@ -2,17 +2,17 @@ import { React, useState } from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button, Box, Divider } from '@mui/material';
 import { useParams } from 'react-router-dom';
 
-const addTiktokFormCountStyle = {
+const addVideoFormCountStyle = {
     display: "flex",
     justifyContent: "space-around",
     gap: "10%"
 }
 
-function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackbar}) {
+function AddVideoForm({openAddVideo, handleAddVideo, getVideos, handleSnackbar}) {
     const params = useParams();
 
     const [imagePreview, setImagePreview] = useState(null);
-    const [addTiktokForm, setAddTiktokForm] = useState({
+    const [addVideoForm, setAddVideoForm] = useState({
         weekly_report: params.id,
         url: null,
         like_count: null,
@@ -22,22 +22,22 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
         thumbnail: null
     });
 
-    const addTiktok = async () => {
-        if (!Object.values(addTiktokForm).every(value => value !== null)) {
+    const addVideo = async () => {
+        if (!Object.values(addVideoForm).every(value => value !== null)) {
             handleSnackbar(true, "ERROR: Please ensure all fields are filled out")
             return;
         }
 
         const formData = new FormData();
-        formData.append('thumbnail', addTiktokForm["thumbnail"]);
-        formData.append("weekly_report", addTiktokForm["weekly_report"])
-        formData.append("url", addTiktokForm["url"])
-        formData.append("like_count", addTiktokForm["like_count"])
-        formData.append("view_count", addTiktokForm["view_count"])
-        formData.append("comment_count", addTiktokForm["comment_count"])
-        formData.append("favourite_count", addTiktokForm["favourite_count"])
+        formData.append('thumbnail', addVideoForm["thumbnail"]);
+        formData.append("weekly_report", addVideoForm["weekly_report"])
+        formData.append("url", addVideoForm["url"])
+        formData.append("like_count", addVideoForm["like_count"])
+        formData.append("view_count", addVideoForm["view_count"])
+        formData.append("comment_count", addVideoForm["comment_count"])
+        formData.append("favourite_count", addVideoForm["favourite_count"])
 
-        handleAddTiktok();
+        handleAddVideo();
         fetch('https://keefe-tk-be.xyz/api/tiktoks/', {
             method: 'POST',
             headers: {
@@ -46,9 +46,9 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
             body: formData,
         })
         .then(() => {
-            getTiktoks();
+            getVideos();
             setImagePreview(null)
-            setAddTiktokForm({
+            setAddVideoForm({
                 weekly_report: params.id,
                 url: null,
                 like_count: null,
@@ -64,11 +64,11 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
         })
     }
 
-    const changeAddTiktokDetails = (e) => {
+    const changeaddVideoDetails = (e) => {
         const {name, value} = e.target;
         
-        setAddTiktokForm({
-          ...addTiktokForm,
+        setAddVideoForm({
+          ...addVideoForm,
           [name]: name !== "thumbnail" ? value : (() => {
             const selectedFile = e.target.files[0]
 
@@ -84,7 +84,7 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
     
 
     return (
-        <Dialog open={openAddTiktok} onClose={handleAddTiktok}>
+        <Dialog open={openAddVideo} onClose={handleAddVideo}>
             <DialogTitle>Manually Add Tiktok</DialogTitle>
             <Divider/>
             <DialogContent>
@@ -106,7 +106,7 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
                     hidden
                     accept="image/*"
                     name="thumbnail"
-                    onChange={changeAddTiktokDetails}
+                    onChange={changeaddVideoDetails}
                     />
                 </Button>
             </Box>
@@ -116,17 +116,17 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
                 label="Video URL"
                 name="url"
                 fullWidth
-                onChange={changeAddTiktokDetails}
+                onChange={changeaddVideoDetails}
                 variant="standard"
             />
-            <Box sx={addTiktokFormCountStyle}>
+            <Box sx={addVideoFormCountStyle}>
                 <TextField
                 autoFocus
                 margin="dense"
                 label="View Count"
                 type="number"
                 name="view_count"
-                onChange={changeAddTiktokDetails}
+                onChange={changeaddVideoDetails}
                 variant="standard"
                 />
                 <TextField
@@ -135,19 +135,19 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
                 label="Like Count"
                 name="like_count"
                 type="number"
-                onChange={changeAddTiktokDetails}
+                onChange={changeaddVideoDetails}
                 variant="standard"
                 />
 
             </Box>
-            <Box sx={addTiktokFormCountStyle}>
+            <Box sx={addVideoFormCountStyle}>
                 <TextField
                 autoFocus
                 margin="dense"
                 label="Comment Count"
                 name="comment_count"
                 type="number"
-                onChange={changeAddTiktokDetails}
+                onChange={changeaddVideoDetails}
                 variant="standard"
                 />
                 <TextField
@@ -156,17 +156,17 @@ function AddTiktokForm({openAddTiktok, handleAddTiktok, getTiktoks, handleSnackb
                 label="Favourite Count"
                 name="favourite_count"
                 type="number"
-                onChange={changeAddTiktokDetails}
+                onChange={changeaddVideoDetails}
                 variant="standard"
                 />
             </Box>
             </DialogContent>
             <DialogActions>
-            <Button onClick={handleAddTiktok}>Cancel</Button>
-            <Button onClick={addTiktok}>Add Tiktok</Button>
+            <Button onClick={handleAddVideo}>Cancel</Button>
+            <Button onClick={addVideo}>Add Tiktok</Button>
             </DialogActions>
         </Dialog>
     )
 }
 
-export default AddTiktokForm
+export default AddVideoForm

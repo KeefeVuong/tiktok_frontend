@@ -7,8 +7,10 @@ function LogoutBtn() {
     const navigate = useNavigate()
 
     const logout = () => {
+        let toRemove = localStorage.getItem("currentUser")
         localStorage.removeItem("token")
         localStorage.removeItem("currentUser")
+        localStorage.setItem("users", JSON.stringify(JSON.parse(localStorage.getItem("users")).filter(user => Object.keys(user)[0] !== toRemove)));
         sessionStorage.clear()
         navigate("/login")
     }
