@@ -8,8 +8,7 @@ export const APIFetch = async (path, method, body) => {
     method: method,
     headers: {
       'Authorization': `${localStorage.getItem("token")}`,
-      // 'Authorization': 'Token 838fde2cfe52cf25e4aa5f6ac90f3ff8418f0c58',
-      'Content-Type' : 'application/json',
+      'Content-Type' : "application/json",
     },
     body: method === 'GET' ? undefined : JSON.stringify(body)
   }
@@ -59,7 +58,15 @@ export const renderImprovements = (stat, improvement_stat, last_updated, individ
   }
   else {
     return (
-      Intl.NumberFormat('en-US', {notation: "compact",maximumFractionDigits: 0}).format(stat)
+      factoriseNum(stat)
     )
   }
+}
+
+export const factoriseNum = (stat) => {
+  return Intl.NumberFormat('en-US', {notation: "compact",maximumFractionDigits: 0}).format(stat)
+}
+
+export const graphData = (weeklyReports, stat, graphXScale=undefined) => {
+  return !graphXScale ? weeklyReports.map(weeklyReport => weeklyReport[stat]).reverse() : weeklyReports.filter(weeklyReport => graphXScale.includes(weeklyReport["title"])).map(weeklyReport => weeklyReport[stat]).reverse()
 }

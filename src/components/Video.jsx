@@ -1,5 +1,5 @@
-import { React, useState, useEffect } from 'react'
-import { Box, Button, TextField, Typography, Skeleton, Fab} from '@mui/material';
+import { React, useState, useRef } from 'react'
+import { Box, IconButton, TextField, Typography, Divider, Button, Hidden } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,51 +8,87 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { Autosave, useAutosave } from 'react-autosave';
 import { APIFetch, renderImprovements } from "../Helper.jsx"
-import Snackbar from "./Snackbar"
-import SaveIcon from '@mui/icons-material/Save';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteTiktokForm from "./DeleteTiktokForm";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Link as ScrollLink, scroller, animateScroll } from 'react-scroll';
 
 const tiktok_stats_style = {
-  height:"350px", 
-  backgroundColor: "#f5ebed", 
+  height:"375px", 
+  backgroundColor: "#FADADD",
   border: "1px solid #f2e6e8",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  justifyContent: "center"
+  justifyContent: "center",
+  width: "200px"
 }
 
-function Video( {tiktoks, setOpenWeeklyNotes} ) {
+function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
 
   const [notes, setNotes] = useState({})
-  const [openSnackbar, setOpenSnackbar] = useState(false)
+  const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
+  const [toDelete, setToDelete] = useState("")
+
+  const handleNotes = (tiktokID, type, newNote) => {
+    let updatedNotes = { ...notes };
+    if (updatedNotes[tiktokID] === undefined) {
+      updatedNotes[tiktokID] = {}
+    }
+    updatedNotes[tiktokID][type] = newNote;
+    setNotes(updatedNotes);
+  }
 
   const updateNotes = async () => {
     for (let tiktokId in notes) {
-      await APIFetch(`/api/tiktoks/${tiktokId}`, "PUT", { "notes": notes[tiktokId] })
+        await APIFetch(`/api/tiktoks/${tiktokId}`, "PUT", notes[tiktokId])
+        .catch((e) => {
+          console.error(e.message)
+          handleSnackbar(true, "ERROR: Saved Notes")
+        })
     }
     if (Object.keys(notes).length !== 0) {
-      setOpenSnackbar(true)
+      handleSnackbar(true, "SUCCESS: Saved Notes")
       setNotes({})
     }
-
   }
+
+  const moveTiktok = async (tiktok, direction) => {
+    await APIFetch(`/api/tiktoks/${tiktok.id}`, 'PUT', {order: direction === "up" ? tiktok.order + 1 : tiktok.order - 1}); 
+    await getTiktoks();
+
+    animateScroll.scrollMore(direction === "up" ? -410 : 410);
+  }
+
+
   useAutosave({ data: notes, onSave: updateNotes, interval: 1000 });
 
   return (
     <>
+    {/* <Box component="h2" sx={{display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Montserrat", fontWeight: "normal", backgroundColor: "#FFD8BE", padding: "0.83em", margin: "0"}}>
+      <AssessmentIcon sx={{paddingRight: "0.3rem"}}/>
+      Weekly Report for {title}
+    </Box> */}
+    <Divider/>
     <TableContainer>
-      <Table aria-label="simple table">
+      <Table>
         <TableHead>
-          <TableRow>
+          <TableRow sx={{backgroundColor: "#FFD8BE"}}>
             <TableCell width="10%">
-              <Typography component="h2"><Box component="span" fontWeight="bold">Tiktok Thumbnail</Box></Typography>
+            <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
+              <Typography component="h1"><Box component="span" fontWeight="bold">Tiktok Thumbnail</Box></Typography>
+              </Box>
             </TableCell>
-            <TableCell width="13%">
-              <Typography component="h2"><Box component="span" fontWeight="bold">Tiktok Statistics</Box></Typography>
+            <TableCell width="10%">
+              <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
+              <Typography component="h1"><Box component="span" fontWeight="bold">Tiktok Statistics</Box></Typography>
+              </Box>
             </TableCell>
             <TableCell>
-              <Typography component="h2"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
-              {/* <Button onClick={() => {setOpenWeeklyNotes(true)}}>Test</Button> */}
+              <Box sx={{"display": "flex", "alignItems": "center", "justifyContent": "space-between"}}>
+                <Typography component="h1"><Box component="span" fontWeight="bold">Additional Notes</Box></Typography>
+              </Box>
             </TableCell>
           </TableRow>
         </TableHead>
@@ -62,12 +98,14 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
               key={tiktok.id}
             >
               <TableCell>
-                <img 
-                alt="tiktok thumbnail" 
-                src={tiktok.thumbnail}
-                height="350px"
-                width="200px"
-                />
+                <a href={tiktok.url} target="_blank">
+                  <img 
+                  alt="tiktok thumbnail" 
+                  src={tiktok.thumbnail}
+                  height="375px"
+                  width="200px"
+                  />
+                </a>
               </TableCell>
               <TableCell>
                 <Box fontSize="17px" sx={tiktok_stats_style}>
@@ -76,35 +114,77 @@ function Video( {tiktoks, setOpenWeeklyNotes} ) {
                     <Box>{renderImprovements(tiktok.like_count, tiktok.improvement_like_count, tiktok.last_updated, true, "Likes")}</Box>
                     <Box>{renderImprovements(tiktok.comment_count, tiktok.improvement_comment_count, tiktok.last_updated, true, "Comments")}</Box>
                     <Box>{renderImprovements(tiktok.favourite_count, tiktok.improvement_favourite_count, tiktok.last_updated, true, "Favourites")}</Box>
+                    <br/>
+                    <Box> <Box fontWeight={"bold"} component="span">{((tiktok.like_count + tiktok.comment_count +tiktok.share_count) / tiktok.view_count).toFixed(2)}%</Box> Engagement</Box>
                   </Box>
                 </Box>
               </TableCell>
               <TableCell>
-                <TextField
-                multiline
-                rows={14}
-                fullWidth
-                sx={{color: "#f5ebed"}}
-                defaultValue={tiktok.notes}
-                label={tiktok.id in notes ? "Saving" : ""}
-                onChange={(e) => {
-                  const updatedNotes = { ...notes };
-                  updatedNotes[tiktok.id] = e.target.value;
-                  setNotes(updatedNotes);
-                }}
-                />
+                <Box>
+
+                  <TextField
+                  label={tiktok.id in notes ? "Saving" : "Hook"}
+                  multiline
+                  fullWidth
+                  rows={1}
+                  size="small"
+                  defaultValue={tiktok.hook}
+                  onChange={(e) => handleNotes(tiktok.id, "hook", e.target.value)}
+                  sx={{marginBottom: "20px"}}
+                  />
+              
+                  <TextField
+                  multiline
+                  rows={5}
+                  fullWidth
+                  defaultValue={tiktok.notes}
+                  label={tiktok.id in notes ? "Saving" : "Notes"}
+                  onChange={(e) => handleNotes(tiktok.id, "notes", e.target.value)}
+                  sx={{color: "#f5ebed", marginBottom: "20px"}}
+                  />
+
+                  <TextField
+                  multiline
+                  rows={5}
+                  fullWidth
+                  sx={{color: "#f5ebed"}}
+                  defaultValue={tiktok.improvements}
+                  label={tiktok.id in notes ? "Saving" : "Improvements"}
+                  onChange={(e) => handleNotes(tiktok.id, "improvements", e.target.value)}
+                  />
+                </Box>
               </TableCell>
-            </TableRow>
+              {
+                editMode &&
+                <TableCell sx={{position: 'absolute', right: "0.2rem", marginTop: "0.34rem"}}>
+                    <Box sx={{display: "flex", justifyContent: "center", backgroundColor: "#ffd8be", borderRadius: "2rem"}}>
+                        <IconButton id={`${tiktok.id}-down`} size="small" onClick={() => {moveTiktok(tiktok, "down")}} disabled={!(tiktok.order > 0)}>
+                          <KeyboardArrowDownIcon size="small" sx={{color: (theme) => (!(tiktok.order > 0) ? theme.palette.text.disabled : '#de8590')}}/>
+                        </IconButton>
+                      <IconButton size="small" onClick={() => {moveTiktok(tiktok, "up")}} disabled={!(tiktok.order < tiktoks.length - 1)}>
+                        <KeyboardArrowUpIcon size="small" sx={{color: (theme) => (!(tiktok.order < tiktoks.length - 1) ? theme.palette.text.disabled : '#de8590')}}/>
+                      </IconButton>
+                      
+                      <IconButton size="small" onClick={() => {setOpenDeleteConfirmation(!openDeleteConfirmation); setToDelete(tiktok.id)}}>
+                        <DeleteIcon size="small" sx={{color: "#de8590"}}/>
+                      </IconButton>
+                    
+                    </Box>
+                </TableCell>
+              }
+          </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
-    {Object.keys(notes).length !== 0 &&
-      <Fab onClick={updateNotes} color="primary" sx={{position: "fixed", bottom: 20, right: 20}}>
-          <SaveIcon />
-      </Fab>
-    }
-    <Snackbar open={openSnackbar} setOpen={setOpenSnackbar} message="SUCCESS: Saved Notes"/>
+
+    <DeleteTiktokForm
+    openDeleteConfirmation={openDeleteConfirmation}
+    setOpenDeleteConfirmation={setOpenDeleteConfirmation}
+    toDelete={toDelete}
+    getTiktoks={getTiktoks}
+    handleSnackbar={handleSnackbar}
+    />
     </>
   )
 }

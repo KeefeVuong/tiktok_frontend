@@ -1,5 +1,5 @@
 import { React, useEffect, useState } from 'react'
-import { Container, TextField, Box, Button, Paper, Typography, Avatar, Tooltip } from '@mui/material';
+import { Container, TextField, Box, Button, Paper, Typography, Avatar, Zoom } from '@mui/material';
 import LoginIcon from '@mui/icons-material/Login';
 import {
     useNavigate
@@ -9,7 +9,7 @@ import logo from "../assets/logo.jpg"
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import useAuth from '../hooks/useAuth.jsx';
-import InfoIcon from '@mui/icons-material/Info';
+import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft';
 
 const containerStyle = {
   height: '100vh',
@@ -28,7 +28,7 @@ const boxStyle = {
 
 const paperStyle = {
   marginTop: "-5rem",
-  padding: "1rem 2rem 2rem 2rem",
+  padding: "2rem",
   width: "20%",
   minWidth: "300px",
 }
@@ -46,14 +46,26 @@ const mainButton  = {
   }
 }
 
-function Login({handleSnackbar}) {
+const backToDashboardButton = {
+  position: "absolute",
+  margin: "1rem",
+  padding: "1",
+  color: "#e6929c",
+  backgroundColor: "white",
+  ":hover": {
+    backgroundColor: "white",
+  },
+  transitionDelay: "400ms"
+}
+
+function AddAccount({handleSnackbar}) {
     const navigate = useNavigate()
+    const {currentUser} = useAuth()
     const [loginForm, setLoginForm] = useState({
       username: '',
       password: '',
     });
     const [showPassword, setShowPassword] = useState(false);
-    const {auth, setAuth} = useAuth();
 
     const changeLoginDetails = (e) => {
       const {name, value} = e.target;
@@ -63,57 +75,37 @@ function Login({handleSnackbar}) {
       })
     }
 
-    const loginAsGuest = (e) => {
-      const guestLogin = {
-        username: "guest",
-        password: "guest"
-      }
-
-      setLoginForm(guestLogin)
-        
-      submitForm(e, guestLogin);
-    }
-
-    const submitForm = async (e, loginDetails) => {
+    const submitForm = async (e) => {
       e.preventDefault()
-      await APIFetch("/api-token-auth/", "POST", loginDetails)
+      await APIFetch("/api-token-auth/", "POST", loginForm)
       .then((data) => {
-          let users = JSON.parse(localStorage.getItem("users")) ?? []
-          let acc = {}
-          acc[loginDetails["username"]] = `Token ${data.token}`
-          if (!users.some(user => JSON.stringify(user) === JSON.stringify(acc))) {
-            users.push(acc)
-          }
+            let users = JSON.parse(localStorage.getItem("users")) ?? []
+            let acc = {}
+            acc[loginForm["username"]] = `Token ${data.token}`
+            if (users.some(user => JSON.stringify(user) === JSON.stringify(acc))) {
+                handleSnackbar(true, "ERROR: Account already exists")
+                return
+            }
 
-          localStorage.setItem("token", `Token ${data.token}`);
-          localStorage.setItem("currentUser", loginDetails["username"])
-          localStorage.setItem("users", JSON.stringify(users))
-          setAuth(true)
-          navigate("/");
+            users.push(acc)
+            localStorage.setItem("users", JSON.stringify(users))
+            navigate("/");
         }
       ).catch(() => {
         handleSnackbar(true, "ERROR: Incorrect Login Credentials")
       })
     }
 
-    useEffect(() => {
-        if (auth) {
-          navigate("/")
-        }
-    }, [])
-
  return (
-    
+    <>
+    <Zoom in={true} style={backToDashboardButton}>
+      <Button variant="filled" component="a" href="#/">
+        <SubdirectoryArrowLeftIcon sx={{marginRight: "0.5rem"}}/>
+        Back To Dashboard
+      </Button>
+    </Zoom>
     <Box sx={containerStyle}> 
-      <Paper component="form" onSubmit={(e) => {submitForm(e, loginForm)}} elevation={2} sx={paperStyle}>
-        <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '3rem'}}>
-          <Button onClick={loginAsGuest} sx={{color: "#e6929c", ':hover': {backgroundColor: "white"}}}>
-            Guest Mode
-          </Button>
-          <Tooltip sx={{color: "#e6929c"}} arrow title="Click here for Guest access to the website. Most functionality has been disabled however feel free to look around!">
-            <InfoIcon fontSize="small"/>
-          </Tooltip>
-        </Box>
+      <Paper component="form" onSubmit={submitForm} elevation={2} sx={paperStyle}>
         <Box sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
           <Avatar alt="Cheekyglo Logo" src={logo} component="span" sx={{ width: 100, height: 100}}/>
           <Typography variant="h4"> 
@@ -143,7 +135,8 @@ function Login({handleSnackbar}) {
 
       </Paper>
     </Box>
+    </>
   );
 }
 
-export default Login
+export default AddAccount

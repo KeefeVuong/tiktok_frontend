@@ -1,20 +1,63 @@
 import { React, useState, useEffect } from 'react'
-import { Box, Button, Typography, Skeleton, Link, Backdrop, CircularProgress, Fab, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
-import { DataGrid, gridColumnGroupsLookupSelector } from '@mui/x-data-grid';
-import { APIFetch, renderImprovements } from "../Helper.jsx"
+import { Box, Typography, Skeleton, Link, Drawer, IconButton, Container, Slider } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
+import { APIFetch, factoriseNum, graphData, renderImprovements } from "../Helper.jsx"
 import Navbar from "../components/Navbar"
-import DeleteIcon from '@mui/icons-material/Delete';
+import useWeeklyReports from '../hooks/useWeeklyReports.jsx';
+import LoadingBackdrop from '../components/LoadingBackdrop.jsx';
+import DeleteWeeklyReportBtn from '../components/DeleteWeeklyReportBtn.jsx';
 import {
-  useNavigate
-} from 'react-router-dom';
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  LogarithmicScale,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import DoubleArrowIcon from '@mui/icons-material/DoubleArrow';
+import TimelineIcon from '@mui/icons-material/Timeline';
+import GraphScale from '../components/GraphScale.jsx';
+import EdiText from 'react-editext';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  LogarithmicScale
+);
 
 
-function Home() {
-  const navigate = useNavigate()
+
+function Home({handleSnackbar}) {
   const [weeklyReports, setWeeklyReports] = useState([])
   const [selected, setSelected] = useState([])
   const [loading, setLoading] = useState(true)
-  const [openDeleteConfirmation, setOpenDeleteConfirmation] = useState(false)
+  const [openGraphs, setOpenGraphs] = useState(false)
+  const {getWeeklyReports, deleteWeeklyReports} = useWeeklyReports({handleSnackbar, selected, setSelected, setWeeklyReports})
+  const [graphYScale, setGraphYScale] = useState([0, 0])
+  const [graphXScale, setGraphXScale] = useState([])
+  const [adjustYAxis, setAdjustYAxis] = useState(false)
+
+  const editTitle = async (value, weekly_report_id) => {
+    await APIFetch(`/api/weekly-reports/${weekly_report_id}`, "PUT", { "title": value })
+    .then(() => {
+      sessionStorage.clear();
+      handleSnackbar(true, "SUCCESS: Update Weekly Report Title");
+      getWeeklyReports();
+    })
+    .catch((error) => {
+        console.error(error.message);
+        handleSnackbar(true, "ERROR: Update Weekly Report Title");
+    })
+}
 
   const columns = [
       { 
@@ -32,32 +75,25 @@ function Home() {
           const id = params.row.id
           const frag = `#weekly-report/${id}`
           return (
-            <Link sx={{color: "#de8590", fontWeight: "bold"}} underline="none" href={frag}>{params.row.title}</Link>
+                <EdiText 
+                submitOnEnter
+                cancelOnEscape
+                submitOnUnfocus
+                showButtonsOnHover
+                onSave={(value) => {
+                  editTitle(value, params.row.id)
+                }}
+                value={params.row.title}
+                renderValue={(value) => {
+                  return (
+                  <Link sx={{color: "#de8590", fontWeight: "bold"}} underline="none" href={frag}>
+                    {value}
+                  </Link>
+                  )
+                }}
+                type="text"
+                />
           )
-        }
-      },
-      { field: 'start_date', width: 150,
-        renderHeader: () => {
-          return (
-            <Typography fontWeight="bold">Start Date</Typography>
-          )
-        },
-        renderCell: (params) => {
-          if (params.row.last_updated === "loading") {
-            return <Skeleton animation="wave" width="100%" />
-          }
-        }
-      },
-      { field: 'end_date', width: 150,
-        renderHeader: () => {
-          return (
-            <Typography fontWeight="bold">End Date</Typography>
-          )
-        },
-        renderCell: (params) => {
-          if (params.row.last_updated === "loading") {
-            return <Skeleton animation="wave" width="100%" />
-          }
         }
       },
       { field: 'total_views', width: 150,
@@ -106,6 +142,9 @@ function Home() {
           )
         },
         renderCell: (params) => {
+          if (params.row.last_updated === "loading") {
+            return <Skeleton animation="wave" width="100%" />
+          }
           return renderImprovements(params.row.total_favourites, params.row.total_improvement_favourites, params.row.last_updated)
         }
     },
@@ -122,104 +161,166 @@ function Home() {
       }
     },
   ];
-
-  const deleteWeeklyReports = async () => {
-    sessionStorage.clear()
-    await APIFetch("/api/weekly-reports/", "DELETE", { ids: selected })
-    getWeeklyReports()
-    setOpenDeleteConfirmation(false)
+  
+  const handleOpenGraphs = () => {
+    setOpenGraphs(!openGraphs)
   }
 
-  const getWeeklyReports = async () => {
-    if (sessionStorage.getItem("weeklyReports") !== null) {
-      setWeeklyReports(JSON.parse(sessionStorage.getItem("weeklyReports")))
-      return
-    }
-    const weeklyReportData = await APIFetch("/api/weekly-reports/", "GET")
-    sessionStorage.setItem("weeklyReports", JSON.stringify(weeklyReportData.reverse()))
-    setWeeklyReports(weeklyReportData.reverse())
-    setSelected([])
-  }
+  const handleGraphYScale = (event, newValue) => {
+    setGraphYScale(newValue);
+  };
 
-  const checkAuth = async () => {
-    if (localStorage.getItem("token") !== null) {
-      await APIFetch("/api/login/", "POST")
-      .catch(() => {
-          localStorage.removeItem("token")
-          navigate("/login")
-      })
-    }
-    else {
-      navigate("/login")
-    }
-  }
+  const handleGraphXScale = (newValue) => {
+    setGraphXScale(...[newValue]);
+  };
 
   useEffect(() => {
-    checkAuth()
     getWeeklyReports()
-    .then(() => setLoading(false))
+    .then(() => {
+      setLoading(false)
+    })
   }, [])
+  
+  useEffect(() => {
+    handleGraphXScale(graphData(weeklyReports, "title"))
+  }, [weeklyReports])
+
+  const totalEngagementData = {
+    labels: graphXScale,
+    datasets: [
+      {
+        label: 'Total Views',
+        data: graphData(weeklyReports,"total_views", graphXScale),
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      },
+      {
+        label: 'Total Likes',
+        data: graphData(weeklyReports, "total_likes", graphXScale),
+        borderColor: 'rgb(53, 162, 235)',
+        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+      },
+      {
+        label: 'Total Comments',
+        data: graphData(weeklyReports, "total_comments", graphXScale),
+        borderColor: "#6C63B1",
+        backgroundColor: "#8884d8",
+      },
+      {
+        label: 'Total Favourites',
+        data: graphData(weeklyReports, "total_favourites", graphXScale),
+        borderColor: "#5DAD7B",
+        backgroundColor: "#82ca9d",
+      },
+    ],
+  };
+
+  const totalEngagementOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Total Engagement',
+      },
+    },
+    scales: {
+      y: { 
+        min: adjustYAxis ? graphYScale[0] : null,
+        max: adjustYAxis ? graphYScale[1] : null,
+        title: {
+          display: true,
+          text: "Engagement"
+        },
+        ticks: {
+          callback: function (value) {
+            return (
+              factoriseNum(value)
+            )
+          },
+        },
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Weekly Reports"
+        }
+      }
+    },
+  };
+
+
   return (
     <>
-    <Navbar weeklyReports={weeklyReports} setWeeklyReports={setWeeklyReports} getWeeklyReports={getWeeklyReports} selected={selected}/>
-    <Box sx={{height: "calc(100vh - 65px)"}}>
+    <Navbar
+    weeklyReports={weeklyReports} 
+    selected={selected} 
+    getWeeklyReports={getWeeklyReports}
+    handleSnackbar={handleSnackbar}
+    />
+    <IconButton onClick={handleOpenGraphs} color="inherit" sx={{marginTop: "2rem", zIndex: "100", position: "fixed", right: "-0.65rem", backgroundColor: "#de8590", borderRadius: "15px", "&:hover": {backgroundColor: "#de8590"}}}>
+      <DoubleArrowIcon sx={{marginRight: "0.5rem", transform: "rotate(180deg)", color: "white"}}/>
+    </IconButton>
+
+    <Box sx={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "calc(100vh - 65px)"}}>
         <DataGrid
-        sx={{border: 0}}
+        sx={{border: "0", height: "60%", width: "100%"}}
         rows={weeklyReports}
         columns={columns}
         checkboxSelection 
         disableRowSelectionOnClick
         rowSelectionModel={selected}
-        onRowSelectionModelChange={(newselected) => {
-          setSelected(newselected);
+        onRowSelectionModelChange={(newSelected) => {
+          setSelected(newSelected)
         }}
         localeText={{ noRowsLabel: loading ? "" : "No Weekly Reports Exist" }}
         autoPageSize
         // initialState={{
-        //     pagination: { paginationModel: { pageSize: 10 } },
-        //     sorting: {
-        //       sortModel: [{ field: 'date', sort: 'desc' }],
+          //     pagination: { paginationModel: { pageSize: 10 } },
+          //     sorting: {
+            //       sortModel: [{ field: 'date', sort: 'desc' }],
         //     },
         // }}
         // pageSizeOptions={[10, 20, 25]}
         />
     </Box>
-    {selected && selected.length > 0 &&
-    <>
-        <Fab onClick={() => setOpenDeleteConfirmation(true)} color="error" sx={{position: "fixed", bottom: "7%", right: "1%"}}>
-            <DeleteIcon/>
-        </Fab>
-    </>
-    }
 
-    <Dialog
-      open={openDeleteConfirmation}
-      onClose={() => setOpenDeleteConfirmation(false)}
+    <Drawer
+      open={openGraphs}
+      onClose={handleOpenGraphs}
+      anchor="right"
     >
-      <DialogTitle>
-        {"Delete selected weekly reports?"}
-      </DialogTitle>
-      <DialogContent>
-        <DialogContentText >
-          By confirming to DELETE, you must be aware that ALL data will be lost
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setOpenDeleteConfirmation(false)}>Cancel</Button>
-        <Button onClick={deleteWeeklyReports} autoFocus>
-          Delete
-        </Button>
-      </DialogActions>
-    </Dialog>
+        <IconButton onClick={handleOpenGraphs} color="inherit" sx={{marginTop: "calc(2rem + 60px)", zIndex: "100", position: "absolute", left: "-0.65rem", backgroundColor: "#de8590", borderRadius: "15px", "&:hover": {backgroundColor: "#de8590"}}}>
+          <DoubleArrowIcon sx={{marginLeft: "0.5rem", color: "white"}}/>
+        </IconButton>
+        <Box color="white" sx={{position: "absolute", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#de8590", height: "65px", width: "100%"}}>
+          <TimelineIcon sx={{marginRight: "0.25rem"}}/>
+          <Typography fontWeight="bold">
+              Tiktok Analytics
+          </Typography>
+        </Box>
+        <Container sx={{display: "flex", flexDirection: "column", justifyContent: "start", margin: "5.5rem 2rem 0rem 2rem", height: "100%"}} maxWidth="md">
+          <GraphScale 
+          graphYScale={graphYScale} 
+          handleGraphYScale={handleGraphYScale} 
+          maxVal={Math.max(...totalEngagementData.datasets[0].data)} 
+          graphXScale={graphXScale} 
+          handleGraphXScale={handleGraphXScale} 
+          weeklyReportTitles={graphData(weeklyReports, "title")}
+          adjustYAxis={adjustYAxis}
+          setAdjustYAxis={setAdjustYAxis}
+          />
+          <Line
+            data={totalEngagementData}
+            options={totalEngagementOptions}
+          />
+        </Container>  
+    </Drawer>
 
-    <Backdrop
-      sx={{ display: "flex", flexDirection: "column", color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      open={loading}
-    >
-      <CircularProgress color="inherit" sx={{marginBottom: "17px"}}/>
-      <Typography>Loading Weekly Reports...</Typography>
-      <Typography>Please wait :)</Typography>
-    </Backdrop>
+    <DeleteWeeklyReportBtn selected={selected} deleteWeeklyReports={deleteWeeklyReports}/>
+    <LoadingBackdrop loading={loading} message={"Loading Weekly Report..."}/>
     </>
   )
 }
