@@ -122,7 +122,7 @@ const NavBar = ({ weeklyReports, getWeeklyReports, selected, handleSnackbar }) =
                                     |
                                     <BulkRefreshBtn selected={selected} handleSnackbar={handleSnackbar} handleSuccessFetch={handleSuccessFetch} />
                                     |
-                                    <ProfileBtn />
+                                    <ProfileBtn getWeeklyReports={getWeeklyReports}/>
                                 </Box>
                             ) : null
                         )}

@@ -3,6 +3,10 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 export const APIFetch = async (path, method, body) => {
+  const baseUrl = window.location.origin.includes("localhost")
+    ? 'http://127.0.0.1:8000'
+    : 'https://keefe-tk-be.xyz';
+
   const callContent = {
     method: method,
     headers: {
@@ -13,18 +17,14 @@ export const APIFetch = async (path, method, body) => {
   }
 
   try {
-    let response = undefined
-    if (window.location.origin.includes("localhost")) {
-      response = await fetch(`http://127.0.0.1:8000${path}`, callContent);
-    }
-    else {
-      response = await fetch(`https://keefe-tk-be.xyz${path}`, callContent);
-    }
+    const response = await fetch(`${baseUrl}${path}`, callContent);
     const data = await response.json();
+
     if (response.ok) {
       return Promise.resolve(data);
     }
-    return Promise.reject(data);
+
+    throw new Error(data);
   } catch (e) {
     return Promise.reject(e);
   }

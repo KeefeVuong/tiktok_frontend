@@ -3,9 +3,9 @@ import { APIFetch } from '../Helper'
 import { usePlatformContext } from '../components/PlatformContext'
 
 function useWeeklyReports({handleSnackbar, selected, setSelected, setWeeklyReports}) {
-
+    
     const {platform, _} = usePlatformContext()
-
+    
     const deleteWeeklyReports = async () => {
         sessionStorage.clear()
         await APIFetch("/api/weekly-reports/", "DELETE", { ids: selected })

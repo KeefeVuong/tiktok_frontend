@@ -1,4 +1,4 @@
-import { React, useState, useContext } from 'react';
+import { React, useState, useContext, useEffect } from 'react';
 import { Button, Typography, Avatar, Menu, MenuItem, Divider,ListItemIcon, Box, Badge} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -31,7 +31,7 @@ const platforms = {
   borderRadius: "10px"
 }
 
-function ProfileBtn() {
+function ProfileBtn({getWeeklyReports}) {
   const {currentUser} = useAuth()
   const [users, setUsers] = useState(JSON.parse(localStorage.getItem("users")) ?? [])
   const [openSettingsModal, setOpenSettingsModal] = useState(false)
@@ -52,10 +52,19 @@ function ProfileBtn() {
       setAnchorEl(null);
     };
 
+    const handlePlatform = (newPlatform) => {
+        setPlatform(newPlatform)
+    }
+
     const addAccountBtnClick = () => {
       handleClose()
       navigate("/add-account")
     }
+
+    useEffect(() => {
+        sessionStorage.clear();
+        getWeeklyReports();
+    }, [platform])
 
     return (
         <>
@@ -107,8 +116,8 @@ function ProfileBtn() {
         {/* <Typography sx={{textAlign: "center", marginBottom: "10px", marginTop: "5px"}}>Switch to Instagram</Typography>
         <Divider sx={{marginBottom: "10px"}}/> */}
         <Box sx={{display: "flex", justifyContent: "center", marginBottom: "7px", gap: "5px"}}>
-            <Avatar alt="tiktok logo" sx={platforms} style={{borderColor: platform === "tiktok" ? "#de8590" : "",}} src={tiktok_logo} onClick={() => setPlatform("tiktok")}/>
-            <Avatar alt="instagram logo" sx={platforms} style={{borderColor: platform === "instagram" ? "#de8590" : "",}} src={instagram_logo} onClick={() => setPlatform("instagram")}/>
+            <Avatar alt="tiktok logo" sx={platforms} style={{borderColor: platform === "tiktok" ? "#de8590" : "",}} src={tiktok_logo} onClick={() => {handlePlatform("tiktok")}}/>
+            <Avatar alt="instagram logo" sx={platforms} style={{borderColor: platform === "instagram" ? "#de8590" : "",}} src={instagram_logo} onClick={() => {handlePlatform("instagram")}}/>
         </Box>
         <Divider sx={{marginBottom: "10px"}}/>
         {users.map((user, i) => {
