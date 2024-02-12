@@ -120,7 +120,7 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
                 </Box>
               </TableCell>
               <TableCell>
-                <Box>
+                <Box style={{display: "flex", flexDirection: "column"}}>
 
                   <TextField
                   label={tiktok.id in notes ? "Saving" : "Hook"}
@@ -144,8 +144,18 @@ function Video( {tiktoks, getTiktoks, handleSnackbar, editMode} ) {
                   />
 
                   <TextField
+                   multiline
+                   rows={2}
+                   fullWidth
+                   defaultValue={tiktok.other_platform_notes}
+                   label={tiktok.id in notes ? "Saving" : "Instagram/Youtube"}
+                   onChange={(e) => handleNotes(tiktok.id, "other_platform_notes", e.target.value)}
+                   sx={{color: "#f5ebed", marginBottom: "20px"}}
+                  />
+
+                  <TextField
                   multiline
-                  rows={5}
+                  rows={2}
                   fullWidth
                   sx={{color: "#f5ebed"}}
                   defaultValue={tiktok.improvements}
