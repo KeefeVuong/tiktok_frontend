@@ -21,7 +21,7 @@ function useWeeklyReports({handleSnackbar, selected, setSelected, setWeeklyRepor
         }
         await APIFetch("/api/weekly-reports/", "GET")
         .then((weeklyReportData) => {
-            sessionStorage.setItem("weeklyReports", JSON.stringify(weeklyReportData.reverse()))
+            sessionStorage.setItem("weeklyReports", JSON.stringify(weeklyReportData))
             setWeeklyReports(weeklyReportData)
             setSelected([])
         })
